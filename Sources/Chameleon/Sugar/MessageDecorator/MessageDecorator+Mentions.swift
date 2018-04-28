@@ -77,7 +77,7 @@ private extension MessageDecorator {
 
                 return RegexMatch(range: range, string: String(text[range]))
             }
-            .flatMap { match in
+            .compactMap { match in
                 guard let value = factory(match) else { return nil }
                 return Link(range: match.range, value: value)
         }

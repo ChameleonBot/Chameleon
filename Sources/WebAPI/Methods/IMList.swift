@@ -8,6 +8,6 @@ public struct IMList: WebAPIRequest {
             let data = dictionary["ims"] as? [[String: Any]]
             else { throw NetworkError.invalidResponse(response) }
 
-        return try data.flatMap { try IM(decoder: Decoder(data: $0)) }
+        return try data.compactMap { try IM(decoder: Decoder(data: $0)) }
     }
 }

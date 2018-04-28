@@ -10,7 +10,7 @@ public extension String {
 }
 
 public extension String {
-    func split(at index: String.IndexDistance) -> (before: String, after: String) {
+    func split(at index: Int) -> (before: String, after: String) {
         let index = self.index(startIndex, offsetBy: index)
         return split(at: index)
     }
