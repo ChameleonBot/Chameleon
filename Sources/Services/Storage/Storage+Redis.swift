@@ -28,6 +28,6 @@ public final class RedisStorage: Storage {
 
         guard let dataArray = try instance.command(.keys, [namespaced(namespace, "*")])?.array else { return [] }
 
-        return dataArray.flatMap { $0?.string?.remove(prefix: namespaced(namespace, "")) }
+        return dataArray.compactMap { $0?.string?.remove(prefix: namespaced(namespace, "")) }
     }
 }
