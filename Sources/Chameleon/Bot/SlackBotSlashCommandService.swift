@@ -36,3 +36,9 @@ public protocol SlackBotSlashCommandService: SlackBotService {
     ///   - command: The `SlashCommand` with the command details
     func onSlashCommand(slackBot: SlackBot, command: SlashCommand) throws
 }
+
+extension SlashCommand {
+    public func respond() -> ChatMessageDecorator {
+        return ChatMessageDecorator(response_url: response_url)
+    }
+}

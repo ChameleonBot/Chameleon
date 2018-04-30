@@ -1,6 +1,8 @@
 
 public struct ChatMessage {
-    public let channel: String
+    public let response_url: String?
+    
+    public let channel: String?
     public let text: String
 
     public let parse: Parse?
@@ -21,7 +23,8 @@ public struct ChatMessage {
     public let attachments: [Attachment]
 
     public init(
-        channel: String,
+        response_url: String? = nil,
+        channel: String? = nil,
         text: String,
         parse: Parse? = nil,
         link_names: Bool? = nil,
@@ -36,6 +39,7 @@ public struct ChatMessage {
         attachments: [Attachment] = []
         )
     {
+        self.response_url = response_url
         self.channel = channel
         self.text = text
         self.parse = parse
@@ -68,6 +72,6 @@ extension ChatMessage: Common.Encodable {
             "thread_ts": thread_ts,
             "reply_broadcast": reply_broadcast,
             "attachments": attachments.map { $0.encode() },
-            ]
+        ]
     }
 }

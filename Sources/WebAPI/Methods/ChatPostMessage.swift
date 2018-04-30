@@ -1,5 +1,8 @@
 
 public struct ChatPostMessage: WebAPIRequest {
+    public var baseUrl: String {
+        return message.response_url ?? DefaultBaseURL
+    }
     public let message: ChatMessage
     public let endpoint = "chat.postMessage"
     public var body: [String: Any?] {

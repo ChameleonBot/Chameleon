@@ -48,6 +48,14 @@ public final class WebAPI {
     }
 }
 
+private extension Dictionary where Value: OptionalType {
+    func encoded(with encoding: Encoding) -> Data? {
+        switch encoding {
+        case .form: return strippingNils().urlEncoded()
+        case .json: return strippingNils().jsonEncoded()
+        }
+    }
+}
 private extension Dictionary {
     func urlEncoded() -> Data? {
         // borrowed from Moya
@@ -64,6 +72,9 @@ private extension Dictionary {
             .joined(separator: "&")
             .data(using: .utf8, allowLossyConversion: false)
     }
+    func jsonEncoded() -> Data? {
+        return try? JSONSerialization.data(withJSONObject: self, options: [])
+    }
 }
 
 private extension WebAPIRequest {
@@ -72,7 +83,7 @@ private extension WebAPIRequest {
             method: .POST,
             url: url,
             headers: [:],
-            body: body.strippingNils().urlEncoded()
+            body: body.encoded(with: encoding)
         )
     }
     func signed(with authenticator: WebAPIAuthenticator?) throws -> NetworkRequest {
@@ -83,7 +94,7 @@ private extension WebAPIRequest {
         guard let authenticator = authenticator else { throw WebAPI.Error.authenticationRequired }
 
         let signedBody = body + ["token": try authenticator.token(for: self)]
-        request.body = signedBody.strippingNils().urlEncoded()
+        request.body = signedBody.encoded(with: encoding)
         return request
     }
 }
