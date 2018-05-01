@@ -16,7 +16,7 @@ public final class RedisKeyValueStore: KeyValueStore {
 
     public init(hostname: String, port: UInt16, password: String? = nil, database: String? = nil) {
         self.factory = {
-            let client = try Client(
+            let client = try TCPClient(
                 hostname: hostname,
                 port: port,
                 password: password
