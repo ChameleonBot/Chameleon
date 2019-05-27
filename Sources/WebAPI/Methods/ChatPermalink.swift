@@ -1,28 +1,25 @@
-import Chameleon
 import Foundation
 
 public struct ChatPermalink: WebAPIRequest {
-    public let id: String
+    public let channelID: String?
     public let ts: String
     
     public let endpoint = "chat.getPermalink"
     public var body: [String : Any?] {
-        return ["channel": id, "ts": ts]
+        return ["channel": channelID, "message_ts": ts]
     }
     
-    public init(id: String, ts: String) {
-        self.id = id
-        self.ts = ts
+    public init(message: Message) {
+        self.channelID = message.channel?.id
+        self.ts = message.ts
     }
     
-    public func handle(response: NetworkResponse) throws -> URL {
+    public func handle(response: NetworkResponse) throws -> String {
         guard
             let dictionary = response.jsonDictionary,
-            let data = dictionary["permalink"] as? String,
-            let url = URL(string: data)
+            let data = dictionary["permalink"] as? String
             else { throw NetworkError.invalidResponse(response) }
-        
-        return url
+        return data
         
     }
 }
