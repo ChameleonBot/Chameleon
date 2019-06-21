@@ -32,7 +32,7 @@ public extension Message {
         case pinned_item
         case unpinned_item
 
-        @available(*, deprecated)
+        @available(*, deprecated, message: "Use thread_broadcast instead")
         case reply_broadcast
         case thread_broadcast
     }
