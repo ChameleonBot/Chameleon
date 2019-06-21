@@ -13,6 +13,7 @@ public struct Message {
     public let thread: Thread?
     public let group: ModelPointer<Group>?
     public let bot_id: ModelPointer<BotUser>?
+    public let hidden: Bool
 }
 
 extension Message: Common.Decodable {
@@ -29,7 +30,8 @@ extension Message: Common.Decodable {
                 im: imPointer(from: decoder),
                 thread: try messageThread(from: decoder),
                 group: groupPointer(from: decoder),
-                bot_id: try? decoder.pointer(at: ["bot_id"])
+                bot_id: try? decoder.pointer(at: ["bot_id"]),
+                hidden: (try? decoder.value(at: ["hidden"])) ?? false
             )
         }
     }
