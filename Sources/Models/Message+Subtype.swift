@@ -1,6 +1,6 @@
 
-public extension Message {
-    enum Subtype: String {
+extension Message {
+    public enum Subtype: String {
         case bot_message
 
         case channel_archive
