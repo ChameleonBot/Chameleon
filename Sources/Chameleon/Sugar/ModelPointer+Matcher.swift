@@ -11,14 +11,13 @@ struct ModelPointerMatcher<T: IDRepresentable>: Matcher {
         guard
             let value = input.components(separatedBy: " ").first,
             value.hasPrefix(prefix),
-            value.hasSuffix(String(suffix)),
-            let end = value.index(of: separator) ?? value.index(of: suffix)
+            let end = value.firstIndex(of: separator) ?? value.firstIndex(of: suffix)
             else { return nil }
 
         return Match(
             key: nil,
             value: ModelPointer<T>(id: String(value[prefix.endIndex..<end])),
-            matched: value
+            matched: String(value[...end])
         )
     }
 
