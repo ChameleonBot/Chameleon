@@ -4,35 +4,30 @@ public struct NoValue {
 
 public struct ElementMatcher {
     public enum Error: Swift.Error {
+        case incorrectElement(expected: Any.Type, received: Any.Type?)
+        case matchFailed(name: String, reason: String)
         case typeMismatch(expected: Any.Type, value: Any?)
     }
 
-    public typealias Match = (values: [Any], remaining: AnyCollection<RichTextElement>)
+    public typealias Match = (values: [Any], remaining: ArraySlice<RichTextElement>)
 
-    public let match: (AnyCollection<RichTextElement>) -> Match?
+    public let match: (ArraySlice<RichTextElement>) throws -> Match
 
-    public init(match: @escaping (AnyCollection<RichTextElement>) -> Match?) {
+    public init(match: @escaping (ArraySlice<RichTextElement>) throws -> Match) {
         self.match = match
     }
 
     public static func ||(lhs: ElementMatcher, rhs: ElementMatcher) -> ElementMatcher {
-        return .init { lhs.match($0) ?? rhs.match($0) }
+        return .init { elements in
+            do { return try lhs.match(elements) }
+            catch { return try rhs.match(elements) }
+        }
     }
     public static func &&(lhs: ElementMatcher, rhs: ElementMatcher) -> ElementMatcher {
         return .init { elements in
-            switch lhs.match(elements) {
-            case let lhsMatch?:
-                switch rhs.match(lhsMatch.remaining) {
-                case let rhsMatch?:
-                    return (lhsMatch.values + rhsMatch.values, rhsMatch.remaining)
-
-                case nil:
-                    return nil
-                }
-
-            case nil:
-                return nil
-            }
+            let lhs = try lhs.match(elements)
+            let rhs = try rhs.match(lhs.remaining)
+            return (lhs.values + rhs.values, rhs.remaining)
         }
     }
 }

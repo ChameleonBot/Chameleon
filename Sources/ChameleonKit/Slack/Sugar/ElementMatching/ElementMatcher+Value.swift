@@ -50,29 +50,69 @@ extension ElementMatcher: ExpressibleByStringLiteral {
 extension ElementMatcher {
     public static func equals(_ value: String) -> ElementMatcher {
         return .init { elements in
-            guard let element = elements.first as? Message.Layout.RichText.Element.Text else { return nil }
-            return element.text.lowercased() == value.lowercased() ? ([NoValue()], elements.dropFirst()) : nil
+            guard let element = elements.first as? Message.Layout.RichText.Element.Text else {
+                throw Error.incorrectElement(
+                    expected: Message.Layout.RichText.Element.Text.self,
+                    received: elements.first.map { type(of: $0) }
+                )
+            }
+
+            guard element.text.lowercased() == value.lowercased() else {
+                throw Error.matchFailed(name: "equals(\(value))", reason: "Found value: '\(element.text)'")
+            }
+
+            return ([NoValue()], elements.dropFirst())
         }
     }
 
     public static func contains(_ value: String) -> ElementMatcher {
         return .init { elements in
-            guard let element = elements.first as? Message.Layout.RichText.Element.Text else { return nil }
-            return element.text.lowercased().contains(value.lowercased()) ? ([NoValue()], elements.dropFirst()) : nil
+            guard let element = elements.first as? Message.Layout.RichText.Element.Text else {
+                throw Error.incorrectElement(
+                    expected: Message.Layout.RichText.Element.Text.self,
+                    received: elements.first.map { type(of: $0) }
+                )
+            }
+
+            guard element.text.lowercased().contains(value.lowercased()) else {
+                throw Error.matchFailed(name: "contains(\(value))", reason: "Found value: '\(element.text)'")
+            }
+
+            return ([NoValue()], elements.dropFirst())
         }
     }
 
     public static func startsWith(_ value: String) -> ElementMatcher {
         return .init { elements in
-            guard let element = elements.first as? Message.Layout.RichText.Element.Text else { return nil }
-            return element.text.lowercased().starts(with: value.lowercased()) ? ([NoValue()], elements.dropFirst()) : nil
+            guard let element = elements.first as? Message.Layout.RichText.Element.Text else {
+                throw Error.incorrectElement(
+                    expected: Message.Layout.RichText.Element.Text.self,
+                    received: elements.first.map { type(of: $0) }
+                )
+            }
+
+            guard element.text.lowercased().starts(with: value.lowercased()) else {
+                throw Error.matchFailed(name: "startsWith(\(value))", reason: "Found value: '\(element.text)'")
+            }
+
+            return ([NoValue()], elements.dropFirst())
         }
     }
 
     public static func endsWith(_ value: String) -> ElementMatcher {
         return .init { elements in
-            guard let element = elements.first as? Message.Layout.RichText.Element.Text else { return nil }
-            return element.text.lowercased().starts(with: value.lowercased()) ? ([NoValue()], elements.dropFirst()) : nil
+            guard let element = elements.first as? Message.Layout.RichText.Element.Text else {
+                throw Error.incorrectElement(
+                    expected: Message.Layout.RichText.Element.Text.self,
+                    received: elements.first.map { type(of: $0) }
+                )
+            }
+
+            guard element.text.lowercased().hasSuffix(value.lowercased()) else {
+                throw Error.matchFailed(name: "endsWith(\(value))", reason: "Found value: '\(element.text)'")
+            }
+
+            return ([NoValue()], elements.dropFirst())
         }
     }
 }

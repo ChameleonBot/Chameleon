@@ -31,13 +31,24 @@ extension ElementMatcher {
 extension ElementMatcher {
     init<T>(parser: Parser<T>, stripWhitespace: Bool = false) {
         self.init { elements in
-            guard let element = elements.first as? Message.Layout.RichText.Element.Text else { return nil }
+            guard let element = elements.first as? Message.Layout.RichText.Element.Text else {
+                throw Error.incorrectElement(
+                    expected: Message.Layout.RichText.Element.Text.self,
+                    received: elements.first.map { type(of: $0) }
+                )
+            }
 
             let text = stripWhitespace
                 ? element.text.replacingOccurrences(of: " ", with: "")
                 : element.text
 
-            return parser.parse(text[...]).map { ([$0.value], elements.dropFirst()) }
+            let elementParser = parser.map { [$0] }
+
+            guard let match = elementParser.parse(text[...]) else {
+                throw Error.matchFailed(name: "parser", reason: "Unable to match against: '\(text)'")
+            }
+
+            return ([match.value], elements.dropFirst())
         }
     }
 }
@@ -55,7 +66,7 @@ eventApi.listen(for: .message) { message in
 
     typealias KarmaMatch = (Identifier<User>, KarmaModifier)
 
-    try message.richText().matching([^.user(me), " how much karma do I have"]) {
+    try message.richText().matching(debug: true, [^.user(me), "how much karma do I have"]) {
         try webApi.perform(.speak(in: message.channel, "Your karma is at: \(counts[message.user, default: 0])"))
     }
 

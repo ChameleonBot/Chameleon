@@ -1,9 +1,9 @@
 extension Array where Element == RichTextElement {
-    private func matchingAll(_ matchers: [ElementMatcher], match: ([ElementMatchQueue]) throws -> Void) throws {
+    private func matchingAll(_ debug: Bool, _ matchers: [ElementMatcher], match: ([ElementMatchQueue]) throws -> Void) throws {
         var queues: [ElementMatchQueue] = []
-        var elements = AnyCollection<RichTextElement>(self)
+        var elements = self[...]
 
-        while let (remaining, match) = elements.matchQueue(matchers) {
+        while let (remaining, match) = elements.matchQueue(debug, matchers) {
             elements = remaining
             queues.append(match)
         }
@@ -12,22 +12,22 @@ extension Array where Element == RichTextElement {
         try match(queues)
     }
 
-    public func matchingAll<A>(_ matchers: [ElementMatcher], match: ([A]) throws -> Void) throws {
-        try matchingAll(matchers, match: { try match($0.map({ try $0.popFirst() })) })
+    public func matchingAll<A>(debug: Bool = false, _ matchers: [ElementMatcher], match: ([A]) throws -> Void) throws {
+        try matchingAll(debug, matchers, match: { try match($0.map({ try $0.popFirst() })) })
     }
-    public func matchingAll<A, B>(_ matchers: [ElementMatcher], match: ([(A, B)]) throws -> Void) throws {
-        try matchingAll(matchers, match: { try match($0.map({ try ($0.popFirst(), $0.popFirst()) })) })
+    public func matchingAll<A, B>(debug: Bool = false, _ matchers: [ElementMatcher], match: ([(A, B)]) throws -> Void) throws {
+        try matchingAll(debug, matchers, match: { try match($0.map({ try ($0.popFirst(), $0.popFirst()) })) })
     }
-    public func matchingAll<A, B, C>(_ matchers: [ElementMatcher], match: ([(A, B, C)]) throws -> Void) throws {
-        try matchingAll(matchers, match: { try match($0.map({ try ($0.popFirst(), $0.popFirst(), $0.popFirst()) })) })
+    public func matchingAll<A, B, C>(debug: Bool = false, _ matchers: [ElementMatcher], match: ([(A, B, C)]) throws -> Void) throws {
+        try matchingAll(debug, matchers, match: { try match($0.map({ try ($0.popFirst(), $0.popFirst(), $0.popFirst()) })) })
     }
-    public func matchingAll<A, B, C, D>(_ matchers: [ElementMatcher], match: ([(A, B, C, D)]) throws -> Void) throws {
-        try matchingAll(matchers, match: { try match($0.map({ try ($0.popFirst(), $0.popFirst(), $0.popFirst(), $0.popFirst()) })) })
+    public func matchingAll<A, B, C, D>(debug: Bool = false, _ matchers: [ElementMatcher], match: ([(A, B, C, D)]) throws -> Void) throws {
+        try matchingAll(debug, matchers, match: { try match($0.map({ try ($0.popFirst(), $0.popFirst(), $0.popFirst(), $0.popFirst()) })) })
     }
-    public func matchingAll<A, B, C, D, E>(_ matchers: [ElementMatcher], match: ([(A, B, C, D, E)]) throws -> Void) throws {
-        try matchingAll(matchers, match: { try match($0.map({ try ($0.popFirst(), $0.popFirst(), $0.popFirst(), $0.popFirst(), $0.popFirst()) })) })
+    public func matchingAll<A, B, C, D, E>(debug: Bool = false, _ matchers: [ElementMatcher], match: ([(A, B, C, D, E)]) throws -> Void) throws {
+        try matchingAll(debug, matchers, match: { try match($0.map({ try ($0.popFirst(), $0.popFirst(), $0.popFirst(), $0.popFirst(), $0.popFirst()) })) })
     }
-    public func matchingAll<A, B, C, D, E, F>(_ matchers: [ElementMatcher], match: ([(A, B, C, D, E, F)]) throws -> Void) throws {
-        try matchingAll(matchers, match: { try match($0.map({ try ($0.popFirst(), $0.popFirst(), $0.popFirst(), $0.popFirst(), $0.popFirst(), $0.popFirst()) })) })
+    public func matchingAll<A, B, C, D, E, F>(debug: Bool = false, _ matchers: [ElementMatcher], match: ([(A, B, C, D, E, F)]) throws -> Void) throws {
+        try matchingAll(debug, matchers, match: { try match($0.map({ try ($0.popFirst(), $0.popFirst(), $0.popFirst(), $0.popFirst(), $0.popFirst(), $0.popFirst()) })) })
     }
 }
