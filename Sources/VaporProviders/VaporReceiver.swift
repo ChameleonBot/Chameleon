@@ -21,6 +21,7 @@ public class VaporReceiver: SlackReceiver {
     private let router: Router
     private let verificationToken: String
     private let eventHandler: SlackEventHandler
+    private let slashCommandHandler: SlashCommandHandler
 
     // MARK: - Public Properties
     public var onError: (Error) -> Void = { print("\nERROR:", $0) }
@@ -31,13 +32,18 @@ public class VaporReceiver: SlackReceiver {
         self.router = try application.make(Router.self)
         self.verificationToken = verificationToken
         self.eventHandler = SlackEventHandler(verificationToken: verificationToken)
+        self.slashCommandHandler = SlashCommandHandler(verificationToken: verificationToken)
 
         enableEvents()
+        enableSlashCommands()
     }
 
     // MARK: - Public Functions
     public func listen<T>(for event: SlackEvent<T>, _ closure: @escaping (T) throws -> Void) {
         eventHandler.listen(for: event, closure)
+    }
+    public func listen(for slashCommand: SlackSlashCommand, _ closure: @escaping (SlashCommand) throws -> Void) {
+        slashCommandHandler.listen(for: slashCommand, closure)
     }
 
     public func start() throws {
@@ -71,24 +77,28 @@ public class VaporReceiver: SlackReceiver {
             }
         }
     }
+    private func enableSlashCommands() {
+        router.grouped(Printer()).post(["slashCommand", PathComponent.anything]) { [unowned self] req -> Future<EventResponse> in
+            let success = req.future(EventResponse.success)
 
-    // MARK: - Public Functions
-    public func listen<T>(for event: SlackEvent<T>, _ closure: @escaping (T) throws -> Void) {
-        var eventHandler = eventHandlers[event.type] ?? EventHandler(processor: event.handle, handlers: [])
-        eventHandler.handlers.append({ try closure($0 as! T) })
-        eventHandlers[event.type] = eventHandler
-    }
-    public func start() throws {
-        try application.run()
-    }
-
-    // MARK: - Private Functions
-    private func handleUrlVerification(_ content: ContentContainer<Request>) throws -> Future<EventResponse> {
-        struct Challenge: Decodable, Equatable {
-            enum Error: Swift.Error {
-                case verificationFailed
+            if (try? req.content.syncGet(Int.self, at: "ssl_check")) != nil {
+                return success
             }
 
+            DispatchQueue.global().async {
+                do {
+                    let packet = try req.content.syncDecode(WithToken<SlashCommand>.self)
+                    let data = try JSONEncoder().encode(packet)
+                    try self.slashCommandHandler.handle(data: data)
+
+                } catch let error {
+                    self.onError(error)
+                }
+            }
+
+            return success
+        }
+    }
     private func handleUrlVerification(_ content: ContentContainer<Request>) throws -> Future<EventResponse> {
         struct Challenge: Decodable, Equatable {
             let token: String

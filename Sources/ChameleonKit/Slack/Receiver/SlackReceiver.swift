@@ -3,6 +3,7 @@ public protocol SlackReceiver: AnyObject {
     var onError: (Error) -> Void { get set }
 
     func listen<T>(for event: SlackEvent<T>, _ closure: @escaping (T) throws -> Void)
+    func listen(for slashCommand: SlackSlashCommand, _ closure: @escaping (SlashCommand) throws -> Void)
 
     func start() throws
 }
