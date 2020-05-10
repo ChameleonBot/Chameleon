@@ -8,6 +8,7 @@ extension Message.Layout.RichText {
 
         public var type: String
         public var style: Style
+        public var indent: Int
         public var elements: [Message.Layout.RichText.Section]
     }
 }

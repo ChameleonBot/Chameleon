@@ -24,8 +24,7 @@ extension SlackEvent {
                 newMessage["previous"] = oldMessage
             }
 
-            let data = try JSONSerialization.data(withJSONObject: newMessage, options: [])
-            return try JSONDecoder().debug(json).decode(Message.self, from: data)
+            return try Message(from: newMessage, decoder: JSONDecoder().debug(json))
         }
     }
 }
