@@ -2,52 +2,50 @@ import ChameleonKit
 import Vapor
 import HTTP
 
+
+//
+private class Printer: Middleware {
+    init() { }
+
+    func respond(to request: Request, chainingTo next: Responder) throws -> EventLoopFuture<Response> {
+        print(request)
+        print("")
+        return try next.respond(to: request)
+    }
+}
+//
+
 public class VaporReceiver: SlackReceiver {
-    private enum EventResponse: ResponseEncodable {
-        case challenge(String)
-        case success
-
-        func encode(for req: Request) throws -> EventLoopFuture<Response> {
-            switch self {
-            case .challenge(let value):
-                return try value.encode(for: req)
-            default:
-                return try HTTPStatus.ok.encode(for: req)
-            }
-        }
-    }
-
-    struct EventHandler {
-        typealias Processor = ([String: Any]) throws -> Any
-        typealias Handler = (Any) throws -> Void
-
-        let processor: Processor
-        var handlers: [Handler]
-    }
-
+    // MARK: - Private Properties
     private let application: Application
     private let router: Router
     private let verificationToken: String
-    private var eventHandlers: [String: EventHandler] = [:]
+    private let eventHandler: SlackEventHandler
+
+    // MARK: - Public Properties
+    public var onError: (Error) -> Void = { print("\nERROR:", $0) }
 
     // MARK: - Lifecycle
     public init(application: Application, verificationToken: String) throws {
         self.application = application
         self.router = try application.make(Router.self)
         self.verificationToken = verificationToken
+        self.eventHandler = SlackEventHandler(verificationToken: verificationToken)
 
-        //
-        class Printer: Middleware {
-            init() { }
+        enableEvents()
+    }
 
-            func respond(to request: Request, chainingTo next: Responder) throws -> EventLoopFuture<Response> {
-//                print(request)
-//                print("")
-                return try next.respond(to: request)
-            }
-        }
-        //
+    // MARK: - Public Functions
+    public func listen<T>(for event: SlackEvent<T>, _ closure: @escaping (T) throws -> Void) {
+        eventHandler.listen(for: event, closure)
+    }
 
+    public func start() throws {
+        try application.run()
+    }
+
+    // MARK: - Private Functions
+    private func enableEvents() {
         router.grouped(Printer()).post("event") { [unowned self] req -> Future<EventResponse> in
             return req.content.get(at: "type").flatMap { (type: String) -> Future<EventResponse> in
                 let success = req.future(EventResponse.success)
@@ -59,34 +57,15 @@ public class VaporReceiver: SlackReceiver {
                 case "event_callback":
                     let data = req.http.body.data ?? Data("{}".utf8)
 
-                    guard
-                        let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                        let token = json["token"] as? String
-                        else { return success }
-
-                    guard token == verificationToken else { return success }
-
-                    guard
-                        let event = json["event"] as? [String: Any],
-                        let eventType = event["type"] as? String,
-                        let handler = self.eventHandlers[eventType]
-                        else { return success }
-
                     DispatchQueue.global().async {
-                        do {
-                            let processed = try handler.processor(event)
-                            try handler.handlers.forEach { try $0(processed) }
-
-                        } catch let error {
-                            print("ERROR!!:", error)
-                        }
+                        do { try self.eventHandler.handle(data: data) }
+                        catch let error { self.onError(error) }
                     }
 
                     return success
 
                 default:
-                    print("\nNO HANDLERS FOR EVENT: \(type)\n")
-                    print(req.http.body.data.flatMap { String(data: $0, encoding: .utf8) } ?? "no data")
+                    self.onError(UnknownPacketError(type: type, packet: req.http.body.data.flatMap { String(data: $0, encoding: .utf8) }))
                     return success
                 }
             }
@@ -110,14 +89,51 @@ public class VaporReceiver: SlackReceiver {
                 case verificationFailed
             }
 
+    private func handleUrlVerification(_ content: ContentContainer<Request>) throws -> Future<EventResponse> {
+        struct Challenge: Decodable, Equatable {
             let token: String
             let challenge: String
             let type: String
         }
 
-        return try content.decode(Challenge.self).map { [verificationToken] challenge in
-            guard challenge.token == verificationToken else { throw Challenge.Error.verificationFailed }
+        return try content.decode(Challenge.self).map { [unowned self] challenge in
+            guard challenge.token == self.verificationToken else { throw SlackPacketError.invalidToken }
             return .challenge(challenge.challenge)
         }
+    }
+}
+
+private struct UnknownPacketError: Error, Equatable {
+    let type: String
+    let packet: String?
+}
+
+private enum EventResponse: ResponseEncodable {
+    case challenge(String)
+    case success
+
+    func encode(for req: Request) throws -> EventLoopFuture<Response> {
+        switch self {
+        case .challenge(let value):
+            return try value.encode(for: req)
+        default:
+            return try HTTPStatus.ok.encode(for: req)
+        }
+    }
+}
+
+private struct WithToken<T: Codable>: Codable {
+    let token: String
+    let value: T
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: AnyCodingKey.self)
+        self.token = try container.decode(String.self, forKey: "token")
+        self.value = try T(from: decoder)
+    }
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: AnyCodingKey.self)
+        try container.encode(token, forKey: "token")
+        try value.encode(to: encoder)
     }
 }
