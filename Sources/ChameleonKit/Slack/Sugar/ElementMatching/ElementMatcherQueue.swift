@@ -1,6 +1,14 @@
 extension ArraySlice where Element == RichTextElement {
-    func matchQueue(_ debug: Bool, _ matchers: [ElementMatcher]) -> (ArraySlice<RichTextElement>, ElementMatchQueue)? {
+    func matchQueue(_ debug: Bool, _ trimWhitespace: Bool, _ matchers: [ElementMatcher]) -> (ArraySlice<RichTextElement>, ElementMatchQueue)? {
         guard let firstMatcher = matchers.first else { return nil }
+
+        let elements: [RichTextElement] = map { element in
+            guard var textElement = element as? Message.Layout.RichText.Element.Text else { return element }
+            if trimWhitespace {
+                textElement.text = textElement.text.trimmingCharacters(in: .whitespaces)
+            }
+            return textElement
+        }
 
         var firstError: Error?
         // find the first match to get a starting point
@@ -8,7 +16,7 @@ extension ArraySlice where Element == RichTextElement {
             firstError = nil
 
             do {
-                let firstMatch = try firstMatcher.match(self[index...])
+                let firstMatch = try firstMatcher.match(elements[index...])
                 var remaining = firstMatch.remaining
 
                 // first one found, move forward from here
@@ -55,10 +63,6 @@ class ElementMatchQueue {
     }
 
     func popFirst<T>() throws -> T {
-        //        if let value = values.first(where: { $0 is T }) {
-        //            values = values.dropFirst()
-        //            return value as! T
-        //        }
         if let value = values.first as? T {
             values = values.dropFirst()
             return value
