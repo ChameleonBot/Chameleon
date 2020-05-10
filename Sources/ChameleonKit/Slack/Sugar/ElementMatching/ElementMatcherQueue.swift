@@ -72,11 +72,3 @@ class ElementMatchQueue {
         }
     }
 }
-
-extension Message.Layout.RichText.Element.Text {
-    func withoutWhitespace() -> Message.Layout.RichText.Element.Text {
-        var copy = self
-        copy.text = text.replacingOccurrences(of: " ", with: "")
-        return copy
-    }
-}
