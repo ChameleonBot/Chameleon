@@ -10,7 +10,7 @@ final class ElementMatchingTests: XCTestCase {
         let message = try Message(from: .richText(text: "", elements: elements))
 
         var user: Identifier<User>?
-        try message.richText().matching(["hello ", .user]) { user = $0 }
+        try message.richText().matching(["hello", .user]) { user = $0 }
 
         XCTAssertEqual(user, .init(rawValue: "user"))
     }
@@ -22,7 +22,7 @@ final class ElementMatchingTests: XCTestCase {
         let message = try Message(from: .richText(text: "", elements: elements))
 
         var user: Identifier<User>?
-        try message.richText().matching(["hello ", .user(.init(rawValue: "user"))]) { user = $0 }
+        try message.richText().matching(["hello", .user(.init(rawValue: "user"))]) { user = $0 }
 
         XCTAssertEqual(user, .init(rawValue: "user"))
     }
@@ -34,7 +34,7 @@ final class ElementMatchingTests: XCTestCase {
         let message = try Message(from: .richText(text: "", elements: elements))
 
         var user: Identifier<User>?
-        try message.richText().matching(["hello ", .user(.init(rawValue: "user"))]) { user = $0 }
+        try message.richText().matching(["hello", .user(.init(rawValue: "user"))]) { user = $0 }
 
         XCTAssertNil(user)
     }
@@ -47,7 +47,7 @@ final class ElementMatchingTests: XCTestCase {
         let message = try Message(from: .richText(text: "", elements: elements))
 
         var user: Identifier<User>?
-        try message.richText().matching([^.user, " how are you?"]) { user = $0 }
+        try message.richText().matching([^.user, "how are you?"]) { user = $0 }
 
         XCTAssertEqual(user, .init(rawValue: "user"))
     }
@@ -60,7 +60,7 @@ final class ElementMatchingTests: XCTestCase {
         let message = try Message(from: .richText(text: "", elements: elements))
 
         var user: Identifier<User>?
-        try message.richText().matching([^.user, " how are you?"]) { user = $0 }
+        try message.richText().matching([^.user, "how are you?"]) { user = $0 }
 
         XCTAssertNil(user)
     }
@@ -73,7 +73,7 @@ final class ElementMatchingTests: XCTestCase {
         let message = try Message(from: .richText(text: "", elements: elements))
 
         var user: Identifier<User>?
-        try message.richText().matching(["hey ", .user^]) { user = $0 }
+        try message.richText().matching(["hey", .user^]) { user = $0 }
 
         XCTAssertEqual(user, .init(rawValue: "user"))
     }
@@ -99,7 +99,7 @@ final class ElementMatchingTests: XCTestCase {
         let message = try Message(from: .richText(text: "", elements: elements))
 
         do {
-            try message.richText().matching(["hello ", .user]) { (a: Identifier<User>, b: Identifier<User>) in
+            try message.richText().matching(["hello", .user]) { (a: Identifier<User>, b: Identifier<User>) in
                 XCTFail("Unexpected success")
             }
         } catch let error as ElementMatcher.Error {
@@ -116,7 +116,7 @@ final class ElementMatchingTests: XCTestCase {
         let message = try Message(from: .richText(text: "", elements: elements))
 
         do {
-            try message.richText().matching(["hello ", .user]) { (a: String) in
+            try message.richText().matching(["hello", .user]) { (a: String) in
                 XCTFail("Unexpected success")
             }
         } catch let error as ElementMatcher.Error {
