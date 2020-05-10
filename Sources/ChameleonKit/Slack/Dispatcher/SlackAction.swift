@@ -28,10 +28,15 @@ public struct SlackAction<Value> {
 extension SlackAction where Value: Decodable {
     public init(name: String, method: Method, encoding: Encoding = .json, packet: Encodable? = nil) {
         self.init(name: name, method: method, encoding: encoding, packet: packet) { data in
+            let decoder = JSONDecoder()
+            if let error = try? decoder.decode(SlackError.self, from: data) {
+                throw error
+            }
+
             do {
-                return try JSONDecoder().decode(Value.self, from: data)
+                return try decoder.decode(Value.self, from: data)
             } catch {
-                return try JSONDecoder().decode(Nested<Value>.self, from: data).value
+                return try decoder.decode(Nested<Value>.self, from: data).value
             }
         }
     }
@@ -39,6 +44,10 @@ extension SlackAction where Value: Decodable {
 
 extension SlackAction where Value == Void {
     public init(name: String, method: Method, encoding: Encoding = .json, packet: Encodable? = nil) {
-        self.init(name: name, method: method, encoding: encoding, packet: packet) { _ in }
+        self.init(name: name, method: method, encoding: encoding, packet: packet) { data in
+            if let error = try? JSONDecoder().decode(SlackError.self, from: data) {
+                throw error
+            }
+        }
     }
 }

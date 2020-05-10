@@ -1,6 +1,12 @@
 import Foundation
 
 extension SlackAction {
+    public static var authDetails: SlackAction<AuthenticationDetails> {
+        return .init(name: "auth.test", method: .get)
+    }
+}
+
+extension SlackAction {
     private struct UserPacket: Encodable {
         let include_locale: Bool
         let user: Identifier<User>
@@ -13,18 +19,26 @@ extension SlackAction {
 }
 
 extension SlackAction {
-    private struct TextPacket: Encodable {
+    private struct ReactionPacket: Encodable {
+        let name: String
         let channel: Identifier<Channel>
-        let text: String
+        let timestamp: String
     }
-    public static func speak(in channel: Identifier<Channel>, _ text: String) -> SlackAction<Void> {
-        let packet = TextPacket(channel: channel, text: text)
-        return .init(name: "chat.postMessage", method: .post, packet: packet)
+
+    public static func react(to message: Message, with emoji: Emoji) -> SlackAction<Void> {
+        let packet = ReactionPacket(name: emoji.rawValue, channel: message.channel, timestamp: message.$ts ?? message.channel.rawValue)
+        return .init(name: "reactions.add", method: .post, packet: packet)
     }
 }
 
 extension SlackAction {
-    public static var authDetails: SlackAction<AuthenticationDetails> {
-        return .init(name: "auth.test", method: .get)
+    private struct PermalinkPacket: Encodable {
+        let channel: Identifier<Channel>
+        let message_ts: String
+    }
+    public static func permalink(for message: Message) -> SlackAction<Permalink> {
+        let message_ts = message.$ts ?? message.channel.rawValue
+        let packet = PermalinkPacket(channel: message.channel, message_ts: message_ts)
+        return .init(name: "chat.getPermalink", method: .post, encoding: .url, packet: packet)
     }
 }
