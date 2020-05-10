@@ -34,11 +34,12 @@ public class SlackEventHandler {
 
         guard
             let event = json["event"] as? [String: Any],
-            let eventType = event["type"] as? String,
-            let handler = eventHandlers[eventType]
+            let eventType = event["type"] as? String
             else { throw SlackPacketError.invalidPacket }
 
-        let processed = try handler.processor(event)
-        try handler.handlers.forEach { try $0(processed) }
+        if let handler = eventHandlers[eventType] {
+            let processed = try handler.processor(event)
+            try handler.handlers.forEach { try $0(processed) }
+        }
     }
 }
