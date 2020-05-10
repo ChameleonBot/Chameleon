@@ -5,14 +5,19 @@ precedencegroup ParserOperatorGroup {
 
 infix operator *>: ParserOperatorGroup
 infix operator <*: ParserOperatorGroup
+infix operator <*>: ParserOperatorGroup
 
 public func *><A, B>(a: Parser<A>, b: Parser<B>) -> Parser<B> {
     return a.flatMap { _ in b.map { $0 } }
 }
-
 public func <*<A, B>(a: Parser<A>, b: Parser<B>) -> Parser<A> {
     return a.flatMap { a in b.map { _ in a } }
 }
+
+public func <*><A, B>(a: Parser<A>, b: Parser<B>) -> Parser<String> {
+    return (a && Parser<Character>.char.until(b)).map { String($0.1.0) }
+}
+
 public func &&<A, B>(a: Parser<A>, b: Parser<B>) -> Parser<(A, B)> {
     return a.flatMap { a in b.map { (a, $0) } }
 }
