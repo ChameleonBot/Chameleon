@@ -27,6 +27,16 @@ public struct ManyOf<T: CodableElementSet>: Codable {
     }
 }
 
+extension KeyedDecodingContainer {
+    public func decode<T>(_ type: ManyOf<T>.Type, forKey key: KeyedDecodingContainer<K>.Key) throws -> ManyOf<T> {
+        if let value = try decodeIfPresent(ManyOf<T>.self, forKey: key) {
+            return value
+        } else {
+            return ManyOf(wrappedValue: [])
+        }
+    }
+}
+
 extension ManyOf: Equatable where T: EquatableCodableElementSet {
     public static func ==(lhs: Self, rhs: Self) -> Bool {
         guard lhs.wrappedValue.count == rhs.wrappedValue.count else { return false }

@@ -1,6 +1,6 @@
 precedencegroup ParserOperatorGroup {
     associativity: left
-    higherThan: LogicalConjunctionPrecedence
+    lowerThan: LogicalConjunctionPrecedence
 }
 
 infix operator *>: ParserOperatorGroup
@@ -13,7 +13,6 @@ public func *><A, B>(a: Parser<A>, b: Parser<B>) -> Parser<B> {
 public func <*<A, B>(a: Parser<A>, b: Parser<B>) -> Parser<A> {
     return a.flatMap { a in b.map { _ in a } }
 }
-
 public func &&<A, B>(a: Parser<A>, b: Parser<B>) -> Parser<(A, B)> {
     return a.flatMap { a in b.map { (a, $0) } }
 }

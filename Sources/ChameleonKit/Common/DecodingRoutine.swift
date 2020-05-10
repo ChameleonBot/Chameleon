@@ -21,6 +21,15 @@ extension DecodingRoutine {
 }
 
 extension DecodingRoutine {
+    public static func item(_ factory: @escaping (Decoder) throws -> T) -> DecodingRoutine {
+        return .init { decoder in
+            guard let value = try? factory(decoder) else { throw DecodingRoutineError.noMatch }
+            return value
+        }
+    }
+}
+
+extension DecodingRoutine {
     public static func item<Key: Decodable & Equatable>(_ factory: @escaping (Decoder) throws -> T, when key: String, equals value: Key) -> DecodingRoutine {
         return .init { decoder in
             guard

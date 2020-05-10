@@ -11,9 +11,16 @@ public struct EncodingRoutine<T> {
 extension EncodingRoutine {
     public func optional() -> EncodingRoutine<T?> {
         return .init { value, encoder in
-            guard let value = value else { return }
+            guard let value = value else { throw EncodingRoutineError.noMatch }
             try self.encode(value, encoder)
         }
+    }
+}
+
+extension EncodingRoutine {
+    public static func null() -> EncodingRoutine {
+        // this type can be anything.. we are just encoding nil
+        return .init { try Optional<Bool>.none.encode(to: $1) }
     }
 }
 
