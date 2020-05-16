@@ -1,4 +1,4 @@
-extension Message {
+extension SlashCommand {
     public func matching<T>(debug: DebugLevel = .none, _ parser: Parser<T>, match: (T) throws -> Void) throws {
         var errors: [Error] = []
 
