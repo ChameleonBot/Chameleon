@@ -28,3 +28,12 @@ public func &&<A, B, C>(a: Parser<(A, B)>, c: Parser<C>) -> Parser<(A, B, C)> {
 public func ||<A>(lhs: Parser<A>, rhs: Parser<A>) -> Parser<A> {
     return lhs.or(rhs)
 }
+
+extension Parser {
+    public static prefix func ^(parser: Parser) -> Parser {
+        return .start *> parser
+    }
+    public static postfix func ^(parser: Parser) -> Parser {
+        return parser <* .end 
+    }
+}
