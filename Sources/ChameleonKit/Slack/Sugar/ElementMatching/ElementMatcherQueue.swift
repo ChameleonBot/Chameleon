@@ -1,5 +1,5 @@
 extension ArraySlice where Element == RichTextElement {
-    func matchQueue(_ debug: Bool, _ trimWhitespace: Bool, _ matchers: [ElementMatcher]) -> (ArraySlice<RichTextElement>, ElementMatchQueue)? {
+    func matchQueue(_ debug: DebugLevel, _ trimWhitespace: Bool, _ matchers: [ElementMatcher]) throws -> (ArraySlice<RichTextElement>, ElementMatchQueue)? {
         guard let firstMatcher = matchers.first else { return nil }
 
         let elements: [RichTextElement] = map { element in
@@ -10,48 +10,47 @@ extension ArraySlice where Element == RichTextElement {
             return textElement
         }
 
-        var firstError: Error?
-        // find the first match to get a starting point
-        for index in indices {
-            firstError = nil
+        var errors: [Error] = []
 
-            do {
-                let firstMatch = try firstMatcher.match(elements[index...])
-                var remaining = firstMatch.remaining
+        func findFirst() -> ElementMatcher.Match? {
+            for index in indices {
+                do {
+                    return try firstMatcher.match(elements[index...])
 
-                // first one found, move forward from here
-                var values = firstMatch.values
-
-                let remainingMatchers = matchers.dropFirst()
-                for matcher in remainingMatchers {
-                    do {
-                        let match = try matcher.match(remaining)
-
-                        values.append(contentsOf: match.values)
-                        remaining = match.remaining
-
-                    } catch let error {
-                        guard debug else { return nil }
-
-                        print("Match Failure:", error)
-                        return nil
-                    }
+                } catch let error {
+                    errors.append(error)
                 }
-
-                let availableValues = values.filter { !($0 is NoValue) }
-                return (remaining, ElementMatchQueue(availableValues))
-
-            } catch let error {
-                firstError = error
-                continue
             }
+            return nil
         }
 
-        if debug, let firstError = firstError {
-            print("Match Failure:", firstError)
-        }
+        if let firstMatch = findFirst() {
+            // first one found, move forward from here
 
-        return nil
+            var remaining = firstMatch.remaining
+            var values = firstMatch.values
+
+            let remainingMatchers = matchers.dropFirst()
+            for matcher in remainingMatchers {
+                do {
+                    let match = try matcher.match(remaining)
+
+                    values.append(contentsOf: match.values)
+                    remaining = match.remaining
+
+                } catch let error {
+                    try debug.handle(error)
+                    return nil
+                }
+            }
+
+            let availableValues = values.filter { !($0 is NoValue) }
+            return (remaining, ElementMatchQueue(availableValues))
+
+        } else {
+            try debug.handle(CompositeError(errors: errors))
+            return nil
+        }
     }
 }
 
