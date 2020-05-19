@@ -3,7 +3,7 @@ import Foundation
 public struct Message: Codable, Equatable {
     public var team: Identifier<Team>
     public var channel: Identifier<Channel>
-    public var channel_type: Channel.Kind
+    public var channel_type: Channel.Kind?
     public var user: Identifier<User>
     public var text: String
 
@@ -42,14 +42,3 @@ extension Message {
         @Convertible<StringTimestamp> public var ts: Date
     }
 }
-
-// this is a very basic message, most notable is `blocks` doesn't exist.. need to either 1) make it optional or 2) embed nil handling into the ManyOf/PR (until stacking is supported)
-//
-//"type": "message",
-//"text": "You have been removed from #help by <@U04UAVAEB>",
-//"user": "USLACKBOT",
-//"ts": "1587516010.000100",
-//"team": "T02TB69LA",
-//"channel": "D011YPL83QC",
-//"event_ts": "1587516010.000100",
-//"channel_type": "im"

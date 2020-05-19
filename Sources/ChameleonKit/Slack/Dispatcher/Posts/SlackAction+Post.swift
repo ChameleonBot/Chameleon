@@ -35,12 +35,18 @@ extension SlackAction {
 }
 
 extension SlackAction {
-    public static func respond(to message: Message, _ target: ResponseTarget, _ text: String) -> SlackAction<Void> {
+    public static func respond(to message: Message, target: ResponseTarget = .inline, _ text: String) -> SlackAction<Message> {
         let target = target.target(message)
         let packet = TextPacket(channel: target.channel, thread_ts: target.thread_ts, text: text)
-        return .init(name: "chat.postMessage", method: .post, packet: packet)
+
+        return .init(name: "chat.postMessage", method: .post, packet: packet) { packet -> Message in
+            var packet = packet
+            packet.squash(from: "message")
+            return try Message(from: packet)
+        }
+        
     }
-    public static func respond(to message: Message, _ target: ResponseTarget, blocks: [LayoutBlockBuilder<MessagesSurface>]) -> SlackAction<Void> {
+    public static func respond(to message: Message, target: ResponseTarget = .inline, blocks: [LayoutBlockBuilder<MessagesSurface>]) -> SlackAction<Message> {
         let target = target.target(message)
         let packet = BlockPacket(channel: target.channel, thread_ts: target.thread_ts, blocks: blocks.map { $0.build() })
         return .init(name: "chat.postMessage", method: .post, packet: packet)

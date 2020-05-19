@@ -1,7 +1,7 @@
 import Foundation
 
 public struct SlackAction<Value> {
-    public typealias Handler = (Data) throws -> Value
+    public typealias Handler = ([String: Any]) throws -> Value
 
     public enum Method {
         case post, get
@@ -21,22 +21,22 @@ public struct SlackAction<Value> {
         self.method = method
         self.encoding = encoding
         self.packet = packet
-        self.handle = handler
+        self.handle = { packet in
+            if let error = try? SlackError(from: packet) {
+                throw error
+            }
+            return try handler(packet)
+        }
     }
 }
 
 extension SlackAction where Value: Decodable {
     public init(name: String, method: Method, encoding: Encoding = .json, packet: Encodable? = nil) {
-        self.init(name: name, method: method, encoding: encoding, packet: packet) { data in
-            let decoder = JSONDecoder()
-            if let error = try? decoder.decode(SlackError.self, from: data) {
-                throw error
-            }
-
+        self.init(name: name, method: method, encoding: encoding, packet: packet) { packet in
             do {
-                return try decoder.decode(Value.self, from: data)
+                return try Value(from: packet)
             } catch {
-                return try decoder.decode(Nested<Value>.self, from: data).value
+                return try Nested<Value>(from: packet).value
             }
         }
     }
@@ -44,10 +44,6 @@ extension SlackAction where Value: Decodable {
 
 extension SlackAction where Value == Void {
     public init(name: String, method: Method, encoding: Encoding = .json, packet: Encodable? = nil) {
-        self.init(name: name, method: method, encoding: encoding, packet: packet) { data in
-            if let error = try? JSONDecoder().decode(SlackError.self, from: data) {
-                throw error
-            }
-        }
+        self.init(name: name, method: method, encoding: encoding, packet: packet) { _ in () }
     }
 }
