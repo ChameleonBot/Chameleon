@@ -35,10 +35,16 @@ public class VaporDispatcher: SlackDispatcher {
                 }
 
                 try request.content.encode(AnyEncodable(packet), as: mediaType)
+
+                print(request.debugDescription)
             }
             .map { response in
                 let data = response.http.body.data ?? .init()
-                return try action.handle(data)
+                guard
+                    let packet = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+                    else { throw SlackPacketError.invalidPacket }
+
+                return try action.handle(packet)
             }
             .wait()
     }
