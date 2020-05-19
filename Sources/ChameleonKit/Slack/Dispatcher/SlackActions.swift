@@ -19,6 +19,17 @@ extension SlackAction {
 }
 
 extension SlackAction {
+    private struct ChannelPacket: Encodable {
+        let channel: Identifier<Channel>
+    }
+
+    public static func channel(_ identifier: Identifier<Channel>) -> SlackAction<Channel> {
+        let packet = ChannelPacket(channel: identifier)
+        return .init(name: "conversations.info", method: .post, encoding: .url, packet: packet)
+    }
+}
+
+extension SlackAction {
     private struct ReactionPacket: Encodable {
         let name: String
         let channel: Identifier<Channel>
