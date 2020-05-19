@@ -1,5 +1,8 @@
 import Foundation
 
+// Disabled for now, only the official client is allowed to send Rich Text blocks
+
+/*
 public protocol RichTextContext { }
 extension MessagesSurface: RichTextContext { }
 
@@ -62,3 +65,4 @@ extension RichTextListElementBuilder {
         }
     }
 }
+*/
