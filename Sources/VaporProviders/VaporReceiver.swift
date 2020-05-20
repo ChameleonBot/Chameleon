@@ -24,7 +24,7 @@ public class VaporReceiver: SlackReceiver {
     private let slashCommandHandler: SlashCommandHandler
 
     // MARK: - Public Properties
-    public var onError: (Error) -> Void = { print("\nERROR:", $0) }
+    public var onError: (Error) -> Void = { print("\nVaporReceiver Error:", $0) }
 
     // MARK: - Lifecycle
     public init(application: Application, verificationToken: String) throws {
