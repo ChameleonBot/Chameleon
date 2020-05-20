@@ -56,6 +56,15 @@
         }
       },
       {
+        "package": "Redis",
+        "repositoryURL": "https://github.com/vapor/redis.git",
+        "state": {
+          "branch": null,
+          "revision": "b6c0c98d2219f550ccf23c4bb8f8b14d75356bc6",
+          "version": "3.4.0"
+        }
+      },
+      {
         "package": "Routing",
         "repositoryURL": "https://github.com/vapor/routing.git",
         "state": {
