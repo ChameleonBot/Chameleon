@@ -125,6 +125,23 @@ final class ElementMatchingTests: XCTestCase {
             XCTFail("Unexpected error")
         }
     }
+
+    func testMultiplePatterns_RecurringPattern_Match() throws {
+        let elements: [RichTextElement] = try [
+            Message.Layout.RichText.Element.Text(from: .text("hello ")),
+            Message.Layout.RichText.Element.User(from: .user("user1")),
+            Message.Layout.RichText.Element.Text(from: .text(" hello ")),
+            Message.Layout.RichText.Element.User(from: .user("user2")),
+        ]
+        let message = try Message(from: .richText(text: "", elements: elements))
+
+        var users: [Identifier<User>]?
+        try message.richText().matchingAll([ElementMatcher.contains("hello"), .user]) { users = $0 }
+        XCTAssertEqual(users, [
+            .init(rawValue: "user1"),
+            .init(rawValue: "user2"),
+        ])
+    }
 }
 
 extension ElementMatcher.Error: Equatable {

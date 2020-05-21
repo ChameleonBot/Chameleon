@@ -13,7 +13,7 @@ extension ArraySlice where Element == RichTextElement {
         var errors: [Error] = []
 
         func findFirst() -> ElementMatcher.Match? {
-            for index in indices {
+            for index in elements.indices {
                 do {
                     return try firstMatcher.match(elements[index...])
 
