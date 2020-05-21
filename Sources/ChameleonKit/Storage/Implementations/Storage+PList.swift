@@ -28,9 +28,6 @@ public class PListStorage: Storage {
 
         } catch KeyValueStorageError.invalid(let key, let expected, let found) {
             throw StorageError.invalid(key: key, expected: expected, found: found)
-
-        } catch let error {
-            throw error
         }
     }
 }
