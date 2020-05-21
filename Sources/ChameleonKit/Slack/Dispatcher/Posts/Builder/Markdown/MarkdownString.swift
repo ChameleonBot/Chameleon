@@ -61,16 +61,19 @@ extension MarkdownString: ExpressibleByStringInterpolation {
         }
 
         public mutating func appendInterpolation(_ value: Identifier<Channel>) {
-            blocks.append("#\(value.rawValue)")
+            blocks.append("<#\(value.rawValue)>")
         }
         public mutating func appendInterpolation(_ value: Identifier<User>) {
-            blocks.append("@\(value.rawValue)")
+            blocks.append("<@\(value.rawValue)>")
         }
         public mutating func appendInterpolation(_ value: Identifier<UserGroup>) {
             blocks.append("<!subteam^\(value.rawValue)>")
         }
         public mutating func appendInterpolation(_ value: Broadcast) {
             blocks.append("<!\(value.rawValue)>")
+        }
+        public mutating func appendInterpolation<T>(_ value: T) {
+            blocks.append("\(value)")
         }
     }
 
