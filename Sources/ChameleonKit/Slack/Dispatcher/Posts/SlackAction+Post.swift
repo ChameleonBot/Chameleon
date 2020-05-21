@@ -26,6 +26,7 @@ extension SlackAction {
         var channel: String
         var thread_ts: String?
         var text: String
+        var mrkdwn = true
     }
     private struct BlockPacket: Encodable {
         var channel: String
@@ -35,16 +36,15 @@ extension SlackAction {
 }
 
 extension SlackAction {
-    public static func respond(to message: Message, _ target: ResponseTarget, with text: String) -> SlackAction<Message> {
+    public static func respond(to message: Message, _ target: ResponseTarget, with markdown: MarkdownString) -> SlackAction<Message> {
         let target = target.target(message)
-        let packet = TextPacket(channel: target.channel, thread_ts: target.thread_ts, text: text)
+        let packet = TextPacket(channel: target.channel, thread_ts: target.thread_ts, text: markdown.value)
 
         return .init(name: "chat.postMessage", method: .post, packet: packet) { packet -> Message in
             var packet = packet
             packet.squash(from: "message")
             return try Message(from: packet)
         }
-        
     }
     public static func respond(to message: Message, _ target: ResponseTarget, with blocks: [LayoutBlockBuilder<MessagesSurface>]) -> SlackAction<Message> {
         let target = target.target(message)
@@ -54,8 +54,8 @@ extension SlackAction {
 }
 
 extension SlackAction {
-    public static func speak(in channel: Identifier<Channel>, _ text: String) -> SlackAction<Void> {
-        let packet = TextPacket(channel: channel.rawValue, text: text)
+    public static func speak(in channel: Identifier<Channel>, _ markdown: MarkdownString) -> SlackAction<Void> {
+        let packet = TextPacket(channel: channel.rawValue, text: markdown.value)
         return .init(name: "chat.postMessage", method: .post, packet: packet)
     }
 
