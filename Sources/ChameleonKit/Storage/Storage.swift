@@ -1,3 +1,8 @@
+public enum StorageError: Error {
+    case missing(key: String)
+    case invalid(key: String, expected: Any.Type, found: String)
+}
+
 public protocol Storage: AnyObject {
     func get<T: LosslessStringConvertible>(forKey key: String, from namespace: String) throws -> T
     func set<T: LosslessStringConvertible>(forKey key: String, from namespace: String, value: T) throws
