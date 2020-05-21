@@ -1,50 +1,49 @@
 import ChameleonKit
 import Redis
 
-public class RedisKeyValueStorage: KeyValueStorage {
-    enum Error: Swift.Error {
-        case invalidValue(expected: Any.Type, value: String)
-    }
-
-    // MARK: - Private Properties
-    private let factory: () throws -> RedisClient
-    private let queue = DispatchQueue(label: "RedisKeyValueStorage")
+public class RedisStorage: Storage {
+    private let keyValueStore: RedisKeyValueStorage
 
     // MARK: - Lifecycle
-    public convenience init(hostname: String, port: Int, password: String?, database: Int?) {
-        var config = RedisClientConfig()
-        config.hostname = hostname
-        config.port = port
-        config.password = password
-        config.database = database
-        self.init(config: config)
+    public init(hostname: String, port: Int, password: String?, database: Int?) {
+        self.keyValueStore = RedisKeyValueStorage(hostname: hostname, port: port, password: password, database: database)
     }
-    public convenience init(url: URL) {
-        let config = RedisClientConfig(url: url)
-        self.init(config: config)
-    }
-    private init(config: RedisClientConfig) {
-        let worker = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-
-        self.factory = {
-            return try RedisDatabase(config: config).newConnection(on: worker).wait()
-        }
+    public init(url: URL) {
+        self.keyValueStore = RedisKeyValueStorage(url: url)
     }
 
     // MARK: - Public Functions
-    public func get<T: LosslessStringConvertible>(forKey key: String) throws -> T {
-        return try queue.sync {
-            return try factory().rawGet(key)
-                .map { $0.string ?? "" }
-                .map { string in
-                    guard let value = T(string) else { throw Error.invalidValue(expected: T.self, value: string) }
-                    return value
-            }
-            .wait()
+    public func get<T: LosslessStringConvertible>(forKey key: String, from namespace: String) throws -> T {
+        return try keyValueStore.get(forKey: namespaced(namespace, key))
+    }
+    public func set<T: LosslessStringConvertible>(forKey key: String, from namespace: String, value: T) throws {
+        try keyValueStore.set(value: value, forKey: namespaced(namespace, key))
+    }
+    public func remove(forKey key: String, from namespace: String) throws {
+        try keyValueStore.remove(forKey: namespaced(namespace, key))
+    }
+    public func keys(in namespace: String) throws -> [String] {
+        return try keyValueStore.raw { client in
+            let keys = try client.command("KEYS", [.basicString(namespaced(namespace, "*"))]).wait().array ?? []
+            return keys.compactMap { $0.string?.drop(prefix: namespaced(namespace, "")) }
         }
     }
 
-    public func set<T: LosslessStringConvertible>(value: T, forKey key: String) throws {
-        try queue.sync { try factory().rawSet(key, to: .basicString(value.description)).wait() }
+    // MARK: - Private Functions
+    private func namespaced(_ namespace: String, _ key: String) -> String {
+        return "\(namespace):\(key)"
+    }
+}
+
+extension String {
+    func drop(prefix: String) -> String {
+        var start = startIndex
+
+        for (char, index) in zip(prefix, indices) {
+            guard self[index] == char else { return self }
+            start = index
+        }
+
+        return start == startIndex ? self : String(self[index(after: start)...])
     }
 }
