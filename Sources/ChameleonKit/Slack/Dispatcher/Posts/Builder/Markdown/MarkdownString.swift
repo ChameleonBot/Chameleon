@@ -2,6 +2,19 @@ import Foundation
 
 public struct MarkdownString {
     let value: String
+
+    public func appending(_ other: MarkdownString) -> MarkdownString {
+        return .init(value: value + other.value)
+    }
+}
+extension Array where Element == MarkdownString {
+    public func joined(separator: String = "") -> MarkdownString {
+        let string = self
+            .map { $0.value }
+            .joined(separator: separator)
+        
+        return .init(value: string)
+    }
 }
 
 extension MarkdownString: ExpressibleByStringInterpolation {
