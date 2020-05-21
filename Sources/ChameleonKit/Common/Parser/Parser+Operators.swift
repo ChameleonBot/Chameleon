@@ -34,6 +34,6 @@ extension Parser {
         return .start *> parser
     }
     public static postfix func ^(parser: Parser) -> Parser {
-        return parser <* .end 
+        return parser <* .end
     }
 }
