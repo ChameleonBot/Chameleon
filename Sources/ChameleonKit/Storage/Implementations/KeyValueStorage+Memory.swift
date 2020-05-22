@@ -1,5 +1,5 @@
 public class MemoryKeyValueStorage: KeyValueStorage {
-    private var data: [String: String] = [:]
+    private(set) var data: [String: String] = [:]
 
     public init() { }
 

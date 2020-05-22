@@ -14,6 +14,9 @@ public class PListStorage: Storage {
     public func remove(forKey key: String, from namespace: String) throws {
         try exec { try keyValue.remove(forKey: namespaced(namespace, key)) }
     }
+    public func keys(in namespace: String) throws -> [String] {
+        return keyValue.data.allKeys.compactMap { $0 as? String }
+    }
 
     // MARK: - Private Functions
     private func namespaced(_ namespace: String, _ key: String) -> String {

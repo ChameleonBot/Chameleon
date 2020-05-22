@@ -7,6 +7,7 @@ public protocol Storage: AnyObject {
     func get<T: LosslessStringConvertible>(forKey key: String, from namespace: String) throws -> T
     func set<T: LosslessStringConvertible>(forKey key: String, from namespace: String, value: T) throws
     func remove(forKey key: String, from namespace: String) throws
+    func keys(in namespace: String) throws -> [String]
 }
 
 extension Storage {

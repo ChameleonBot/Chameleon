@@ -15,7 +15,7 @@ extension Directory {
 
 public class PListKeyValueStorage: KeyValueStorage {
     private let filename: String
-    private let data: NSMutableDictionary
+    let data: NSMutableDictionary
 
     public init(directory: Directory = .home, name: String) {
         let filename = "\(directory.path())/\(name).plist"
