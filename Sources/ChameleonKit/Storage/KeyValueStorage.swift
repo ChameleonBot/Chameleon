@@ -10,7 +10,11 @@ public protocol KeyValueStorage: AnyObject {
 }
 
 extension KeyValueStorage {
-    public func get<T: LosslessStringConvertible>(forKey key: String, or value: @autoclosure() -> T) -> T {
-        return (try? get(forKey: key)) ?? value()
+    public func get<T: LosslessStringConvertible>(forKey key: String, or value: @autoclosure() -> T) throws -> T {
+        do {
+            return try get(forKey: key)
+        } catch KeyValueStorageError.missing {
+            return value()
+        }
     }
 }

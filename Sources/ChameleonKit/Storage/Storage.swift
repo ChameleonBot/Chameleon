@@ -11,7 +11,11 @@ public protocol Storage: AnyObject {
 }
 
 extension Storage {
-    public func get<T: LosslessStringConvertible>(forKey key: String, from namespace: String, or value: @autoclosure() -> T) -> T {
-        return (try? get(forKey: key, from: namespace)) ?? value()
+    public func get<T: LosslessStringConvertible>(forKey key: String, from namespace: String, or value: @autoclosure() -> T) throws -> T {
+        do {
+            return try get(forKey: key, from: namespace)
+        } catch StorageError.missing {
+            return value()
+        }
     }
 }
