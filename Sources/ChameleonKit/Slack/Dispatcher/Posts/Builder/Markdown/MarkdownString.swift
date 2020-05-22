@@ -3,6 +3,10 @@ import Foundation
 public struct MarkdownString {
     let value: String
 
+    public init(value: String) {
+        self.value = value
+    }
+
     public func appending(_ other: MarkdownString) -> MarkdownString {
         return .init(value: value + other.value)
     }
