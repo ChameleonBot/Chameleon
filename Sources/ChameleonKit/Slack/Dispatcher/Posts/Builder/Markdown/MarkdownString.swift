@@ -22,6 +22,21 @@ extension Array where Element == MarkdownString {
 }
 
 extension MarkdownString: ExpressibleByStringInterpolation {
+    public struct Modifier {
+        let modify: (String) -> String
+
+        public init(modify: @escaping (String) -> String) {
+            self.modify = modify
+        }
+
+        public static let none = Modifier { $0 }
+        public static let bold = Modifier { "*\($0)*" }
+        public static let italic = Modifier { "_\($0)_" }
+        public static let strike = Modifier { "~\($0)~" }
+        public static let inlineCode = Modifier { "`\($0)`" }
+        public static let code = Modifier { "```\($0)```" }
+    }
+
     //https://api.slack.com/reference/surfaces/formatting#block-formatting
     public struct StringInterpolation: StringInterpolationProtocol {
         var blocks: [String] = []
@@ -31,37 +46,15 @@ extension MarkdownString: ExpressibleByStringInterpolation {
         public mutating func appendLiteral(_ literal: String) {
             blocks.append(literal.slackEscaped())
         }
+        public mutating func appendLiteral(_ literal: String, _ modifier: Modifier = .none) {
+            blocks.append(modifier.modify(literal.slackEscaped()))
+        }
         public mutating func appendInterpolation(_ emoji: Emoji) {
             blocks.append(":\(emoji.rawValue):")
         }
-
-        public enum Bold { case bold }
-        public mutating func appendInterpolation(_ value: String, _: Bold) {
-            blocks.append("*\(value.slackEscaped())*")
-        }
-
-        public enum Italic { case italic }
-        public mutating func appendInterpolation(_ value: String, _: Italic) {
-            blocks.append("_\(value.slackEscaped())_")
-        }
-
-        public enum Strike { case strike }
-        public mutating func appendInterpolation(_ value: String, _: Strike) {
-            blocks.append("~\(value.slackEscaped())~")
-        }
-
-        public enum InlineCode { case inlineCode }
-        public mutating func appendInterpolation(_ value: String, _: InlineCode) {
-            blocks.append("`\(value.slackEscaped())`")
-        }
-
-        public enum Code { case code }
-        public mutating func appendInterpolation(_ value: String, _: Code) {
-            blocks.append("```\(value.slackEscaped())```")
-        }
-
+        
         public enum Quote { case quote }
-        public mutating func appendInterpolation(_: Code, _ lines: [String]) {
+        public mutating func appendInterpolation(_: Quote, _ lines: [String]) {
             var lines = lines.map { "\n>\($0.slackEscaped())" }
             if lines.isEmpty, let first = lines.first {
                 lines[0] = String(first[first.index(first.startIndex, offsetBy: 1)...])
@@ -70,27 +63,27 @@ extension MarkdownString: ExpressibleByStringInterpolation {
             }
         }
 
-        public mutating func appendInterpolation(_ value: URL) {
-            blocks.append("<\(value.absoluteString)>")
+        public mutating func appendInterpolation(_ value: URL, _ modifier: Modifier = .none) {
+            blocks.append(modifier.modify("<\(value.absoluteString)>"))
         }
         public mutating func appendInterpolation(_ value: URL, _ title: MarkdownString) {
             blocks.append("<\(value.absoluteString)|\(title.value)>")
         }
 
-        public mutating func appendInterpolation(_ value: Identifier<Channel>) {
-            blocks.append("<#\(value.rawValue)>")
+        public mutating func appendInterpolation(_ value: Identifier<Channel>, _ modifier: Modifier = .none) {
+            blocks.append(modifier.modify("<#\(value.rawValue)>"))
         }
-        public mutating func appendInterpolation(_ value: Identifier<User>) {
-            blocks.append("<@\(value.rawValue)>")
+        public mutating func appendInterpolation(_ value: Identifier<User>, _ modifier: Modifier = .none) {
+            blocks.append(modifier.modify("<@\(value.rawValue)>"))
         }
-        public mutating func appendInterpolation(_ value: Identifier<UserGroup>) {
-            blocks.append("<!subteam^\(value.rawValue)>")
+        public mutating func appendInterpolation(_ value: Identifier<UserGroup>, _ modifier: Modifier = .none) {
+            blocks.append(modifier.modify("<!subteam^\(value.rawValue)>"))
         }
-        public mutating func appendInterpolation(_ value: Broadcast) {
-            blocks.append("<!\(value.rawValue)>")
+        public mutating func appendInterpolation(_ value: Broadcast, _ modifier: Modifier = .none) {
+            blocks.append(modifier.modify("<!\(value.rawValue)>"))
         }
-        public mutating func appendInterpolation<T>(_ value: T) {
-            blocks.append("\(value)")
+        public mutating func appendInterpolation<T>(_ value: T, _ modifier: Modifier = .none) {
+            blocks.append(modifier.modify("\(value)"))
         }
     }
 
