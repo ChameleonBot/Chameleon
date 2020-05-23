@@ -69,7 +69,7 @@ extension MarkdownString: ExpressibleByStringInterpolation {
         public mutating func appendInterpolation(_ value: URL, _ modifier: Modifier = .none) {
             blocks.append(modifier.modify("<\(value.absoluteString)>"))
         }
-        public mutating func appendInterpolation(_ value: URL, _ title: MarkdownString) {
+        public mutating func appendInterpolation(_ title: MarkdownString, _ value: URL) {
             blocks.append("<\(value.absoluteString)|\(title.value)>")
         }
 
@@ -85,6 +85,7 @@ extension MarkdownString: ExpressibleByStringInterpolation {
         public mutating func appendInterpolation(_ value: Broadcast, _ modifier: Modifier = .none) {
             blocks.append(modifier.modify("<!\(value.rawValue)>"))
         }
+
         public mutating func appendInterpolation<T>(_ value: T, _ modifier: Modifier = .none) {
             blocks.append(modifier.modify("\(value)"))
         }
