@@ -8,7 +8,6 @@ public class RedisKeyValueStorage: KeyValueStorage {
 
     // MARK: - Private Properties
     private let factory: () throws -> RedisClient
-    private let queue = DispatchQueue(label: "RedisKeyValueStorage")
 
     // MARK: - Lifecycle
     public convenience init(hostname: String, port: Int, password: String?, database: Int?) {
@@ -26,8 +25,16 @@ public class RedisKeyValueStorage: KeyValueStorage {
     private init(config: RedisClientConfig) {
         let worker = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
 
+        var client: RedisClient?
+        let queue = DispatchQueue(label: "RedisKeyValueStorage")
+
         self.factory = {
-            return try RedisDatabase(config: config).newConnection(on: worker).wait()
+            return try queue.sync {
+                if client == nil || client?.isClosed == true {
+                    client = try RedisDatabase(config: config).newConnection(on: worker).wait()
+                }
+                return client!
+            }
         }
     }
 
@@ -52,12 +59,6 @@ public class RedisKeyValueStorage: KeyValueStorage {
 
     // MARK: - Internal
     func raw<T>(_ closure: (RedisClient) throws -> T) throws -> T {
-        return try queue.sync {
-            let client = try factory()
-            let result = try closure(client)
-            try client.syncShutdownGracefully()
-            return result
-        }
+        return try closure(factory())
     }
 }
-    
