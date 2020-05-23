@@ -52,7 +52,12 @@ public class RedisKeyValueStorage: KeyValueStorage {
 
     // MARK: - Internal
     func raw<T>(_ closure: (RedisClient) throws -> T) throws -> T {
-        return try queue.sync { try closure(factory()) }
+        return try queue.sync {
+            let client = try factory()
+            let result = try closure(client)
+            try client.syncShutdownGracefully()
+            return result
+        }
     }
 }
     
