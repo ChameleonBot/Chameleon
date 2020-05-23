@@ -3,3 +3,9 @@ extension Parser {
         return map { _ in () }
     }
 }
+
+extension Parser {
+    public static func anyOf(_ values: [Parser]) -> Parser {
+        return values.reduce(never, ||)
+    }
+}

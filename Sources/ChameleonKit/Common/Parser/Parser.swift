@@ -13,11 +13,11 @@ public struct Parser<T> {
     }
 }
 
-//extension Parser {
-////    public static var never: Parser { .init { _ in nil } }
-//
-//    public static func just(_ value: T) -> Parser { .init { (value, $0) } }
-//}
+extension Parser {
+    public static var never: Parser {
+        return .init { _ in throw ParserError.matchFailed(name: "never", reason: "") }
+    }
+}
 
 extension Parser {
     public func map<U>(_ transform: @escaping (T) -> U) -> Parser<U> {
