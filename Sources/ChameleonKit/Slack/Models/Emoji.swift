@@ -9,4 +9,5 @@ public struct Emoji: Codable, Hashable, RawRepresentable {
 extension Emoji {
     public static var smile: Emoji { .init(rawValue: #function) }
     public static var balloon: Emoji { .init(rawValue: #function) }
+    public static var wave: Emoji { .init(rawValue: #function) }
 }
