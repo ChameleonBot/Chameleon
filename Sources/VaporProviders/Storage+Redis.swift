@@ -25,7 +25,8 @@ public class RedisStorage: Storage {
     public func keys(in namespace: String) throws -> [String] {
         return try exec {
             return  try keyValueStore.raw { client in
-                let keys = try client.command("KEYS", [.basicString(namespaced(namespace, "*"))]).wait().array ?? []
+                let redisKeys = try client.command("KEYS", [.bulkString(namespaced(namespace, "*"))]).wait()
+                let keys = redisKeys.array ?? []
                 return keys.compactMap { $0.string?.drop(prefix: namespaced(namespace, "")) }
             }
         }
