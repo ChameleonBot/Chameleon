@@ -54,7 +54,10 @@ extension MarkdownString: ExpressibleByStringInterpolation {
         }
         
         public enum Quote { case quote }
-        public mutating func appendInterpolation(_: Quote, _ lines: [String]) {
+        public mutating func appendInterpolation(_ value: String, _: Quote) {
+            blocks.append(">\(value.slackEscaped())")
+        }
+        public mutating func appendInterpolation(_ lines: [String], _: Quote) {
             var lines = lines.map { "\n>\($0.slackEscaped())" }
             if lines.isEmpty, let first = lines.first {
                 lines[0] = String(first[first.index(first.startIndex, offsetBy: 1)...])
