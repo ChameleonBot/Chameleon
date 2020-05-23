@@ -1,0 +1,19 @@
+{
+    "client_msg_id": "clientMessageId",
+    "type": "message",
+    "text": "%text%",
+    "user": "senderId",
+    "ts": "1587853252.002200",
+    "team": "teamId",
+    "blocks": [{
+        "type": "rich_text",
+        "block_id": "blockA",
+        "elements": [{
+            "type": "rich_text_section",
+            "elements": %richTextElements%,
+        }],
+    }],
+    "channel": "channelId",
+    "event_ts": "1587853252.002200",
+    "channel_type": "channel"
+}
