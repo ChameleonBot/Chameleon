@@ -9,6 +9,7 @@ let package = Package(
         .macOS(.v10_15),
     ],
     products: [
+        .executable(name: "Chameleon", targets: ["Chameleon"]),
         .library(name: "ChameleonKit", targets: ["ChameleonKit"]),
         .library(name: "VaporProviders", targets: ["VaporProviders"]),
     ],
@@ -19,6 +20,7 @@ let package = Package(
         .package(url: "https://github.com/vapor/redis.git", from: "3.0.0"),
     ],
     targets: [
+        .target(name: "Chameleon", dependencies: ["ChameleonKit", "VaporProviders"]),
         .target(name: "ChameleonKit", dependencies: []),
         .target(name: "VaporProviders", dependencies: ["ChameleonKit", "Vapor", "HTTP", "URLEncodedForm", "Redis"]),
         .testTarget(name: "ChameleonKitTests", dependencies: ["ChameleonKit"]),
