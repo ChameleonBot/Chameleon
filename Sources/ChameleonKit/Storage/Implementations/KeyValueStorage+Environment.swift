@@ -7,7 +7,7 @@ import Darwin.C
 public final class Environment: KeyValueStorage {
     public init() { }
 
-    public func get<T: LosslessStringConvertible>(forKey key: String) throws -> T {
+    public func get<T: LosslessStringConvertible>(_: T.Type, forKey key: String) throws -> T {
         guard
             let rawValue = getenv(key),
             let value = String(utf8String: rawValue)

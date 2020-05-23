@@ -13,7 +13,7 @@ public class RedisStorage: Storage {
     }
 
     // MARK: - Public Functions
-    public func get<T: LosslessStringConvertible>(forKey key: String, from namespace: String) throws -> T {
+    public func get<T: LosslessStringConvertible>(_: T.Type, forKey key: String, from namespace: String) throws -> T {
         return try exec { try keyValueStore.get(forKey: namespaced(namespace, key)) }
     }
     public func set<T: LosslessStringConvertible>(forKey key: String, from namespace: String, value: T) throws {

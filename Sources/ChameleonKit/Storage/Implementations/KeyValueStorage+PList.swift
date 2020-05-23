@@ -23,7 +23,7 @@ public class PListKeyValueStorage: KeyValueStorage {
         self.filename = filename
         self.data = NSMutableDictionary(contentsOfFile: filename) ?? .init()
     }
-    public func get<T: LosslessStringConvertible>(forKey key: String) throws -> T {
+    public func get<T: LosslessStringConvertible>(_: T.Type, forKey key: String) throws -> T {
         guard let string = data[key] as? String else { throw KeyValueStorageError.missing(key: key) }
         guard let value = T(string) else { throw KeyValueStorageError.invalid(key: key, expected: T.self, found: string) }
         return value

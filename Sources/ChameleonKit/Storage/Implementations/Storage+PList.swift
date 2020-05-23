@@ -5,7 +5,7 @@ public class PListStorage: Storage {
         self.keyValue = PListKeyValueStorage(directory: directory, name: name)
     }
 
-    public func get<T: LosslessStringConvertible>(forKey key: String, from namespace: String) throws -> T {
+    public func get<T: LosslessStringConvertible>(_: T.Type, forKey key: String, from namespace: String) throws -> T {
         return try exec { try keyValue.get(forKey: namespaced(namespace, key)) }
     }
     public func set<T: LosslessStringConvertible>(forKey key: String, from namespace: String, value: T) throws {

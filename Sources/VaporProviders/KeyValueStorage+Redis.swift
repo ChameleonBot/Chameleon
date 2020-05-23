@@ -32,7 +32,7 @@ public class RedisKeyValueStorage: KeyValueStorage {
     }
 
     // MARK: - Public Functions
-    public func get<T: LosslessStringConvertible>(forKey key: String) throws -> T {
+    public func get<T: LosslessStringConvertible>(_: T.Type, forKey key: String) throws -> T {
         return try raw { client in
             return try client.rawGet(key)
                 .map { $0.string ?? "" }
