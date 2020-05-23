@@ -8,11 +8,15 @@ let package = Package(
     platforms: [
         .macOS(.v10_15),
     ],
+    products: [
+        .library(name: "ChameleonKit", targets: ["ChameleonKit"]),
+        .library(name: "VaporProviders", targets: ["VaporProviders"]),
+    ],
     dependencies: [
         .package(url: "https://github.com/vapor/vapor.git", from: "3.0.0"),
         .package(url: "https://github.com/vapor/http.git", from: "3.0.0"),
         .package(url: "https://github.com/vapor/url-encoded-form.git", from: "1.0.0"),
-        .package(url: "https://github.com/vapor/redis.git", from: "3.0.0")
+        .package(url: "https://github.com/vapor/redis.git", from: "3.0.0"),
     ],
     targets: [
         .target(name: "ChameleonKit", dependencies: []),
