@@ -52,6 +52,8 @@ public class VaporReceiver: SlackReceiver {
 
     // MARK: - Private Functions
     private func enableEvents() {
+        router.get("ping") { try HTTPStatus.ok.encode(for: $0) }
+
         router.grouped(Printer()).post("event") { [unowned self] req -> Future<EventResponse> in
             return req.content.get(at: "type").flatMap { (type: String) -> Future<EventResponse> in
                 let success = req.future(EventResponse.success)
