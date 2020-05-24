@@ -1,7 +1,7 @@
 import Foundation
 
 public struct Message: Codable, Equatable {
-    public var team: Identifier<Team>?
+    public var team: Identifier<Team>
     public var channel: Identifier<Channel>
     public var channel_type: Channel.Kind?
     public var user: Identifier<User>
