@@ -16,6 +16,17 @@ public class RedisStorage: Storage {
     public func get<T: LosslessStringConvertible>(_: T.Type, forKey key: String, from namespace: String) throws -> T {
         return try exec { try keyValueStore.get(forKey: namespaced(namespace, key)) }
     }
+    public func getAll<T: LosslessStringConvertible>(_: T.Type, forKeys keys: [String], from namespace: String) throws -> [T] {
+        return try exec {
+            return  try keyValueStore.raw { client in
+                return try client.mget(keys.map { namespaced(namespace, $0) }).wait().map { data in
+                    let string = data.string ?? ""
+                    guard let value = T(string) else { throw RedisError.invalidValue(expected: T.self, value: string) }
+                    return value
+                }
+            }
+        }
+    }
     public func set<T: LosslessStringConvertible>(forKey key: String, from namespace: String, value: T) throws {
         try exec { try keyValueStore.set(value: value, forKey: namespaced(namespace, key)) }
     }

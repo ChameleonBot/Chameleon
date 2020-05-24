@@ -8,6 +8,9 @@ public class PListStorage: Storage {
     public func get<T: LosslessStringConvertible>(_: T.Type, forKey key: String, from namespace: String) throws -> T {
         return try exec { try keyValue.get(forKey: namespaced(namespace, key)) }
     }
+    public func getAll<T: LosslessStringConvertible>(_: T.Type, forKeys keys: [String], from namespace: String) throws -> [T] {
+        return try exec { try keys.map { try keyValue.get(T.self, forKey: $0) } }
+    }
     public func set<T: LosslessStringConvertible>(forKey key: String, from namespace: String, value: T) throws {
         try exec { try keyValue.set(value: value, forKey: namespaced(namespace, key)) }
     }

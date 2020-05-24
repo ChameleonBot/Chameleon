@@ -5,7 +5,10 @@ public enum StorageError: Error {
 
 public protocol Storage: AnyObject {
     func get<T: LosslessStringConvertible>(_: T.Type, forKey key: String, from namespace: String) throws -> T
+    func getAll<T: LosslessStringConvertible>(_: T.Type, forKeys keys: [String], from namespace: String) throws -> [T]
+
     func set<T: LosslessStringConvertible>(forKey key: String, from namespace: String, value: T) throws
+
     func remove(forKey key: String, from namespace: String) throws
     func keys(in namespace: String) throws -> [String]
 }
@@ -13,6 +16,9 @@ public protocol Storage: AnyObject {
 extension Storage {
     public func get<T: LosslessStringConvertible>(forKey key: String, from namespace: String) throws -> T {
         return try get(T.self, forKey: key, from: namespace)
+    }
+    public func getAll<T: LosslessStringConvertible>(forKeys keys: [String], from namespace: String) throws -> [T] {
+        return try getAll(T.self, forKeys: keys, from: namespace)
     }
     public func get<T: LosslessStringConvertible>(_: T.Type = T.self, forKey key: String, from namespace: String, or value: @autoclosure() -> T) throws -> T {
         do {

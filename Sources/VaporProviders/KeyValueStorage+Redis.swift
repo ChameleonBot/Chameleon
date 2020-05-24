@@ -1,11 +1,11 @@
 import ChameleonKit
 import Redis
 
-public class RedisKeyValueStorage: KeyValueStorage {
-    enum Error: Swift.Error {
-        case invalidValue(expected: Any.Type, value: String)
-    }
+enum RedisError: Swift.Error {
+    case invalidValue(expected: Any.Type, value: String)
+}
 
+public class RedisKeyValueStorage: KeyValueStorage {
     // MARK: - Private Properties
     private let factory: () throws -> RedisClient
 
@@ -44,14 +44,14 @@ public class RedisKeyValueStorage: KeyValueStorage {
             return try client.rawGet(key)
                 .map { $0.string ?? "" }
                 .map { string in
-                    guard let value = T(string) else { throw Error.invalidValue(expected: T.self, value: string) }
+                    guard let value = T(string) else { throw RedisError.invalidValue(expected: T.self, value: string) }
                     return value
             }
             .wait()
         }
     }
     public func set<T: LosslessStringConvertible>(value: T, forKey key: String) throws {
-        try raw { try $0.rawSet(key, to: .basicString(value.description)).wait() }
+        try raw { try $0.rawSet(key, to: .bulkString(value.description)).wait() }
     }
     public func remove(forKey key: String) throws {
         try raw { try $0.delete(key).wait() }
