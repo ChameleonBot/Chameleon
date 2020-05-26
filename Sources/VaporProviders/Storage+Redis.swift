@@ -19,9 +19,11 @@ public class RedisStorage: Storage {
     public func getAll<T: LosslessStringConvertible>(_: T.Type, forKeys keys: [String], from namespace: String) throws -> [T] {
         return try exec {
             return  try keyValueStore.raw { client in
-                return try client.mget(keys.map { namespaced(namespace, $0) }).wait().map { data in
-                    let string = data.string ?? ""
-                    guard let value = T(string) else { throw RedisError.invalidValue(expected: T.self, value: string) }
+                let allKeys = keys.map { namespaced(namespace, $0) }
+                let rows = try client.mget(allKeys).wait()
+                return zip(allKeys, rows).map { key, data in
+                    guard let string = data.string else { throw StorageError.missing(key: key) }
+                    guard let value = T(string) else { throw StorageError.invalid(key: key, expected: T.self, found: string) }
                     return value
                 }
             }

@@ -1,10 +1,6 @@
 import ChameleonKit
 import Redis
 
-enum RedisError: Swift.Error {
-    case invalidValue(expected: Any.Type, value: String)
-}
-
 public class RedisKeyValueStorage: KeyValueStorage {
     // MARK: - Private Properties
     private let factory: () throws -> RedisClient
@@ -42,12 +38,15 @@ public class RedisKeyValueStorage: KeyValueStorage {
     public func get<T: LosslessStringConvertible>(_: T.Type, forKey key: String) throws -> T {
         return try raw { client in
             return try client.rawGet(key)
-                .map { $0.string ?? "" }
+                .map { value -> String in
+                    guard let string = value.string else { throw KeyValueStorageError.missing(key: key) }
+                    return string
+                }
                 .map { string in
-                    guard let value = T(string) else { throw RedisError.invalidValue(expected: T.self, value: string) }
+                    guard let value = T(string) else { throw KeyValueStorageError.invalid(key: key, expected: T.self, found: string) }
                     return value
-            }
-            .wait()
+                }
+                .wait()
         }
     }
     public func set<T: LosslessStringConvertible>(value: T, forKey key: String) throws {
