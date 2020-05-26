@@ -21,7 +21,7 @@ public class RedisStorage: Storage {
             return  try keyValueStore.raw { client in
                 let allKeys = keys.map { namespaced(namespace, $0) }
                 let rows = try client.mget(allKeys).wait()
-                return zip(allKeys, rows).map { key, data in
+                return try zip(allKeys, rows).map { key, data in
                     guard let string = data.string else { throw StorageError.missing(key: key) }
                     guard let value = T(string) else { throw StorageError.invalid(key: key, expected: T.self, found: string) }
                     return value
