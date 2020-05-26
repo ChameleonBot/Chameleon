@@ -11,11 +11,10 @@ extension ResponseTarget {
 
     public static var threaded: ResponseTarget {
         return .init { message in
-            if message.threading == .reply {
+            if message.threading == .threaded {
                 return inline.target(message)
             } else {
-                let channel = message.$thread_ts ?? message.channel.rawValue
-                return (channel: channel, thread_ts: message.$ts)
+                return (channel: message.channel.rawValue, thread_ts: message.$ts)
             }
         }
     }

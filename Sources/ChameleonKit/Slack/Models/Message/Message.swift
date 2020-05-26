@@ -26,13 +26,13 @@ extension Message {
     public enum Thread {
         case unthreaded
         case parent
-        case reply
+        case threaded
     }
     public var threading: Thread {
         guard let thread_ts = $thread_ts else { return .unthreaded }
 
         if thread_ts == $ts { return .parent }
-        else { return .reply }
+        else { return .threaded }
     }
 }
 
