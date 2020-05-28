@@ -7,7 +7,7 @@ public struct SlackAction<Value> {
         case post, get
     }
     public enum Encoding {
-        case json, url
+        case json, url, formData
     }
 
     public let name: String

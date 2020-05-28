@@ -32,6 +32,7 @@ public class VaporDispatcher: SlackDispatcher {
                 switch action.encoding {
                 case .url:  mediaType = .urlEncodedForm
                 case .json: mediaType = .json
+                case .formData: mediaType = .formData
                 }
 
                 try request.content.encode(AnyEncodable(packet), as: mediaType)
