@@ -24,8 +24,9 @@ public class SlackBot {
     }
 
     // MARK: - Public Functions - Receiving
-    public func listen<T>(for event: SlackEvent<T>, closure: @escaping (SlackBot, T) throws -> Void) {
-        receiver.listen(for: event) { [unowned self] in try closure(self, $0) }
+    @discardableResult
+    public func listen<T>(for event: SlackEvent<T>, closure: @escaping (SlackBot, T) throws -> Void) -> Cancellable {
+        return receiver.listen(for: event) { [unowned self] in try closure(self, $0) }
     }
     public func listen(for slashCommand: SlackSlashCommand, _ closure: @escaping (SlackBot, SlashCommand) throws -> Void) {
         receiver.listen(for: slashCommand) { [unowned self] in try closure(self, $0) }

@@ -39,8 +39,9 @@ public class VaporReceiver: SlackReceiver {
     }
 
     // MARK: - Public Functions
-    public func listen<T>(for event: SlackEvent<T>, _ closure: @escaping (T) throws -> Void) {
-        eventHandler.listen(for: event, closure)
+    @discardableResult
+    public func listen<T>(for event: SlackEvent<T>, _ closure: @escaping (T) throws -> Void) -> Cancellable {
+        return eventHandler.listen(for: event, closure)
     }
     public func listen(for slashCommand: SlackSlashCommand, _ closure: @escaping (SlashCommand) throws -> Void) {
         slashCommandHandler.listen(for: slashCommand, closure)

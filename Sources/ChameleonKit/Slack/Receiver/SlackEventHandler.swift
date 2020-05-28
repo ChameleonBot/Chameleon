@@ -2,11 +2,13 @@ import Foundation
 
 public class SlackEventHandler {
     struct EventHandler {
+        typealias Predicate = (String) -> Bool
         typealias Processor = ([String: Any]) throws -> Any
         typealias Handler = (Any) throws -> Void
 
+        let predicate: Predicate
         let processor: Processor
-        var handlers: [Handler]
+        var handlers: [String: Handler]
     }
 
     // MARK: - Private Properties
@@ -19,10 +21,15 @@ public class SlackEventHandler {
     }
 
     // MARK: - Public Functions
-    public func listen<T>(for event: SlackEvent<T>, _ closure: @escaping (T) throws -> Void) {
-        var eventHandler = eventHandlers[event.type] ?? EventHandler(processor: event.handle, handlers: [])
-        eventHandler.handlers.append({ try closure($0 as! T) })
-        eventHandlers[event.type] = eventHandler
+    @discardableResult
+    public func listen<T>(for event: SlackEvent<T>, _ closure: @escaping (T) throws -> Void) -> Cancellable {
+        var eventHandler = eventHandlers[event.identifier] ?? EventHandler(predicate: event.canHandle, processor: event.handle, handlers: [:])
+        let id = UUID().uuidString
+        eventHandler.handlers[id] = { try closure($0 as! T) }
+        eventHandlers[event.identifier] = eventHandler
+        return .init { [weak self] in
+            self?.eventHandlers[event.identifier]?.handlers[id] = nil
+        }
     }
     public func handle(data: Data) throws {
         guard
@@ -37,9 +44,10 @@ public class SlackEventHandler {
             let eventType = event["type"] as? String
             else { throw SlackPacketError.invalidPacket }
 
-        if let handler = eventHandlers[eventType] {
-            let processed = try handler.processor(event)
-            try handler.handlers.forEach { try $0(processed) }
+        let matchingHandlers = eventHandlers.values.filter { $0.predicate(eventType) }
+        for eventHandler in matchingHandlers {
+            let processed = try eventHandler.processor(event)
+            try eventHandler.handlers.values.forEach { try $0(processed) }
         }
     }
 }
