@@ -1,0 +1,10 @@
+{
+    "token": "%token%",
+    "team_id": "T00000000",
+    "api_app_id": "A0000000000",
+    "event": %event%,
+    "type": "event_callback",
+    "event_id": "Ev0000000000",
+    "event_time": 1590514809,
+    "authed_users": ["U0000000000"]
+}
