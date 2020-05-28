@@ -18,7 +18,7 @@ extension Decodable {
 }
 
 extension FixtureSource {
-    public init(json fileName: String, map: [FixtureKey: LosslessStringConvertible] = [:], source: String = #file) throws {
+    public init(jsonFile fileName: String, map: [FixtureKey: LosslessStringConvertible] = [:], source: String = #file) throws {
         let file = URL(fileURLWithPath: source)
         let directory = file.deletingLastPathComponent()
         let url = directory.appendingPathComponent("\(fileName).json")

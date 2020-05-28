@@ -15,7 +15,7 @@ extension FixtureSource {
     public static func message(text: String, elements: [RichTextElement]) throws -> FixtureSource<SlackReceiver, Message> {
         let richTextElements = try JSONEncoder().encode(EncodeMany<RichTextElements>(values: elements))
 
-        return try .init(json: "Message_RichTextElements", map: [
+        return try .init(jsonFile: "Message_RichTextElements", map: [
             .text: text,
             .richTextElements: String(data: richTextElements, encoding: .utf8)!
         ])
