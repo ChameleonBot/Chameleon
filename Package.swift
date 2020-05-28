@@ -11,6 +11,7 @@ let package = Package(
     products: [
         .executable(name: "Chameleon", targets: ["Chameleon"]),
         .library(name: "ChameleonKit", targets: ["ChameleonKit"]),
+        .library(name: "ChameleonTestKit", targets: ["ChameleonTestKit"]),
         .library(name: "VaporProviders", targets: ["VaporProviders"]),
     ],
     dependencies: [
@@ -22,8 +23,9 @@ let package = Package(
     targets: [
         .target(name: "Chameleon", dependencies: ["ChameleonKit", "VaporProviders"]),
         .target(name: "ChameleonKit", dependencies: []),
+        .target(name: "ChameleonTestKit", dependencies: ["ChameleonKit"]),
         .target(name: "VaporProviders", dependencies: ["ChameleonKit", "Vapor", "HTTP", "URLEncodedForm", "Redis"]),
-        .testTarget(name: "ChameleonKitTests", dependencies: ["ChameleonKit"]),
+        .testTarget(name: "ChameleonKitTests", dependencies: ["ChameleonTestKit"]),
     ]
 )
 
