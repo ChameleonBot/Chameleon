@@ -1,0 +1,26 @@
+{
+    "ok": true,
+    "channel": "C0000000000",
+    "ts": "1590532376.003500",
+    "message": {
+        "bot_id": "B0000000000",
+        "type": "message",
+        "text": "",
+        "user": "U0000000000",
+        "ts": "1590532376.003500",
+        "team": "T00000000",
+        "bot_profile": {
+            "id": "B0000000000",
+            "deleted": false,
+            "name": "testbot",
+            "updated": 1590514190,
+            "app_id": "A0000000000",
+            "icons": {
+                "image_36": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_36.png",
+                "image_48": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/bot_48.png",
+                "image_72": "https:\/\/a.slack-edge.com\/80588\/img\/plugins\/app\/service_72.png"
+            },
+            "team_id": "T00000000"
+        }
+    }
+}
