@@ -1,5 +1,6 @@
 import XCTest
 import ChameleonKit
+import ChameleonTestKit
 
 final class ElementMatchingTests: XCTestCase {
     func testAnyUser() throws {
@@ -7,7 +8,7 @@ final class ElementMatchingTests: XCTestCase {
             Message.Layout.RichText.Element.Text(from: .text("hello ")),
             Message.Layout.RichText.Element.User(from: .user("user"))
         ]
-        let message = try Message(from: .richText(text: "", elements: elements))
+        let message = try Message(from: .message(text: "", elements: elements))
 
         var user: Identifier<User>?
         try message.richText().matching(["hello", .user]) { user = $0 }
@@ -19,7 +20,7 @@ final class ElementMatchingTests: XCTestCase {
             Message.Layout.RichText.Element.Text(from: .text("hello ")),
             Message.Layout.RichText.Element.User(from: .user("user")),
         ]
-        let message = try Message(from: .richText(text: "", elements: elements))
+        let message = try Message(from: .message(text: "", elements: elements))
 
         var user: Identifier<User>?
         try message.richText().matching(["hello", .user(.init(rawValue: "user"))]) { user = $0 }
@@ -31,7 +32,7 @@ final class ElementMatchingTests: XCTestCase {
             Message.Layout.RichText.Element.Text(from: .text("hello ")),
             Message.Layout.RichText.Element.User(from: .user("other_user")),
         ]
-        let message = try Message(from: .richText(text: "", elements: elements))
+        let message = try Message(from: .message(text: "", elements: elements))
 
         var user: Identifier<User>?
         try message.richText().matching(["hello", .user(.init(rawValue: "user"))]) { user = $0 }
@@ -44,7 +45,7 @@ final class ElementMatchingTests: XCTestCase {
             Message.Layout.RichText.Element.User(from: .user("user")),
             Message.Layout.RichText.Element.Text(from: .text(" how are you?")),
         ]
-        let message = try Message(from: .richText(text: "", elements: elements))
+        let message = try Message(from: .message(text: "", elements: elements))
 
         var user: Identifier<User>?
         try message.richText().matching([^.user, "how are you?"]) { user = $0 }
@@ -57,7 +58,7 @@ final class ElementMatchingTests: XCTestCase {
             Message.Layout.RichText.Element.User(from: .user("user")),
             Message.Layout.RichText.Element.Text(from: .text(" how are you?")),
         ]
-        let message = try Message(from: .richText(text: "", elements: elements))
+        let message = try Message(from: .message(text: "", elements: elements))
 
         var user: Identifier<User>?
         try message.richText().matching([^.user, "how are you?"]) { user = $0 }
@@ -70,7 +71,7 @@ final class ElementMatchingTests: XCTestCase {
             Message.Layout.RichText.Element.Text(from: .text("hey ")),
             Message.Layout.RichText.Element.User(from: .user("user")),
         ]
-        let message = try Message(from: .richText(text: "", elements: elements))
+        let message = try Message(from: .message(text: "", elements: elements))
 
         var user: Identifier<User>?
         try message.richText().matching(["hey", .user^]) { user = $0 }
@@ -83,7 +84,7 @@ final class ElementMatchingTests: XCTestCase {
             Message.Layout.RichText.Element.User(from: .user("user")),
             Message.Layout.RichText.Element.Text(from: .text(" how are you?")),
         ]
-        let message = try Message(from: .richText(text: "", elements: elements))
+        let message = try Message(from: .message(text: "", elements: elements))
 
         var user: Identifier<User>?
         try message.richText().matching(["hey ", .user^]) { user = $0 }
@@ -96,7 +97,7 @@ final class ElementMatchingTests: XCTestCase {
             Message.Layout.RichText.Element.Text(from: .text("hello ")),
             Message.Layout.RichText.Element.User(from: .user("user")),
         ]
-        let message = try Message(from: .richText(text: "", elements: elements))
+        let message = try Message(from: .message(text: "", elements: elements))
 
         do {
             try message.richText().matching(["hello", .user]) { (a: Identifier<User>, b: Identifier<User>) in
@@ -113,7 +114,7 @@ final class ElementMatchingTests: XCTestCase {
             Message.Layout.RichText.Element.Text(from: .text("hello ")),
             Message.Layout.RichText.Element.User(from: .user("user")),
         ]
-        let message = try Message(from: .richText(text: "", elements: elements))
+        let message = try Message(from: .message(text: "", elements: elements))
 
         do {
             try message.richText().matching(["hello", .user]) { (a: String) in
@@ -133,7 +134,7 @@ final class ElementMatchingTests: XCTestCase {
             Message.Layout.RichText.Element.Text(from: .text(" hello ")),
             Message.Layout.RichText.Element.User(from: .user("user2")),
         ]
-        let message = try Message(from: .richText(text: "", elements: elements))
+        let message = try Message(from: .message(text: "", elements: elements))
 
         var users: [Identifier<User>]?
         try message.richText().matchingAll([ElementMatcher.contains("hello"), .user]) { users = $0 }
