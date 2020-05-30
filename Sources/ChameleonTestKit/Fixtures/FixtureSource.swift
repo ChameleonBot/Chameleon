@@ -18,6 +18,9 @@ extension Decodable {
 }
 
 extension FixtureSource {
+    public init(raw: String) {
+        self.init(data: { Data(raw.utf8) })
+    }
     public init(jsonFile fileName: String, map: [FixtureKey: LosslessStringConvertible] = [:], source: String = #file) throws {
         let file = URL(fileURLWithPath: source)
         let directory = file.deletingLastPathComponent()

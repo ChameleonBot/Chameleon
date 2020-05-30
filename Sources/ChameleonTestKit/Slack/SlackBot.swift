@@ -28,6 +28,10 @@ extension SlackBot {
         public func receive<T>(_ fixture: FixtureSource<SlackReceiver, T>) throws {
             try receiver.receive(fixture)
         }
+        public func receive<T, U>(_ incoming: FixtureSource<SlackReceiver, T>, enqueue outgoing: FixtureSource<SlackDispatcher, U>) throws {
+            try enqueue(outgoing)
+            try receive(incoming)
+        }
         public func enqueue<T>(_ fixture: FixtureSource<SlackDispatcher, T>) throws {
             try dispatcher.enqueue(fixture)
         }
