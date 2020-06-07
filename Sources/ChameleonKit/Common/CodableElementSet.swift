@@ -24,6 +24,7 @@ extension Optional: EquatableCodableElementSet where Wrapped: EquatableCodableEl
     public static func isEqual(_ lhs: Element, _ rhs: Element) -> Bool {
         switch (lhs, rhs) {
         case (let lhs?, let rhs?): return Wrapped.isEqual(lhs, rhs)
+        case (nil, nil): return true
         default: return false
         }
     }
