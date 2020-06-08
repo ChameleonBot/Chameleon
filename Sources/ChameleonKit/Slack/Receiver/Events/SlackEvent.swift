@@ -1,8 +1,8 @@
 import Foundation
 
 public struct SlackEvent<Packet> {
-    public typealias CanHandle = (String) -> Bool
-    public typealias Handler = ([String: Any]) throws -> Packet
+    public typealias CanHandle = (_ type: String, _ json: [String: Any]) -> Bool
+    public typealias Handler = (_ json: [String: Any]) throws -> Packet
 
     public let identifier: String
     public let canHandle: CanHandle

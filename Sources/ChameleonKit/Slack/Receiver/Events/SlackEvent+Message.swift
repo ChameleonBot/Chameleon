@@ -4,7 +4,9 @@ extension SlackEvent {
     public static var message: SlackEvent<Message> {
         return .init(
             identifier: "message",
-            canHandle: { $0 == "message" },
+            canHandle: { type, json in
+                return type == "message"
+            },
             handler: { json in
                 // json message data can exist inside root keys:
                 // - message

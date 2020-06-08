@@ -2,7 +2,7 @@ import Foundation
 
 public class SlackEventHandler {
     struct EventHandler {
-        typealias Predicate = (String) -> Bool
+        typealias Predicate = (String, [String: Any]) -> Bool
         typealias Processor = ([String: Any]) throws -> Any
         typealias Handler = (Any) throws -> Void
 
@@ -44,7 +44,7 @@ public class SlackEventHandler {
             let eventType = event["type"] as? String
             else { throw SlackPacketError.invalidPacket }
 
-        let matchingHandlers = eventHandlers.values.filter { $0.predicate(eventType) }
+        let matchingHandlers = eventHandlers.values.filter { $0.predicate(eventType, event) }
         for eventHandler in matchingHandlers {
             let processed = try eventHandler.processor(event)
             try eventHandler.handlers.values.forEach { try $0(processed) }
