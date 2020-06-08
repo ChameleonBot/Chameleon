@@ -5,5 +5,5 @@ public struct SlackSlashCommand: RawRepresentable, Equatable, Codable {
         self.rawValue = rawValue
     }
 
-    public var normalized: String { return rawValue.replacingOccurrences(of: "/", with: "") }
+    public var normalized: String { rawValue.replacingOccurrences(of: "/", with: "") }
 }

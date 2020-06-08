@@ -9,9 +9,9 @@ public struct FixtureKey: RawRepresentable, Hashable {
 }
 
 extension FixtureKey {
-    public static var text: FixtureKey { return .init(rawValue: #function) }
-    public static var richTextElements: FixtureKey { return .init(rawValue: #function) }
-    public static var userId: FixtureKey { return .init(rawValue: #function) }
-    public static var event: FixtureKey { return .init(rawValue: #function) }
-    public static var token: FixtureKey { return .init(rawValue: #function) }
+    public static var text: FixtureKey { .init(rawValue: #function) }
+    public static var richTextElements: FixtureKey { .init(rawValue: #function) }
+    public static var userId: FixtureKey { .init(rawValue: #function) }
+    public static var event: FixtureKey { .init(rawValue: #function) }
+    public static var token: FixtureKey { .init(rawValue: #function) }
 }
