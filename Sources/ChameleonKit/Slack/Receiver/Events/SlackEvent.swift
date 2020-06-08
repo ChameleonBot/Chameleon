@@ -17,10 +17,12 @@ public struct SlackEvent<Packet> {
 
 extension SlackEvent where Packet: Decodable {
     public init(identifier: String, canHandle: @escaping CanHandle) {
-        self.identifier = identifier
-        self.canHandle = canHandle
-        self.handle = { json in
-            return try Packet(from: json, decoder: JSONDecoder().debug(json))
-        }
+        self.init(
+            identifier: identifier,
+            canHandle: canHandle,
+            handler: { json in
+                return try Packet(from: json, decoder: JSONDecoder().debug(json))
+            }
+        )
     }
 }
