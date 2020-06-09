@@ -1,7 +1,7 @@
 import Foundation
 
 public struct MarkdownString {
-    let value: String
+    public let value: String
 
     public init(value: String) {
         self.value = value

@@ -12,11 +12,15 @@ extension FixtureSource {
         userId: String = "U0000000000",
         channelId: String = "C0000000000",
         kind: Channel.Kind = .channel,
-        _ elements: [RichTextElement]
+        _ elements: [RichTextFixture]
     ) throws -> FixtureSource<SlackReceiver, Message> {
 
-        let value = ""
-        let richTextElements = try JSONEncoder().encode(EncodeMany<RichTextElements>(values: elements))
+        let pairs = try elements
+            .map { try $0.values() }
+            .unzip()
+
+        let value = pairs.0.joined().value
+        let richTextElements = try String(data: JSONEncoder().encode(EncodeMany<RichTextElements>(values: pairs.1)), encoding: .utf8)!
 
         return .init(raw: """
         {
