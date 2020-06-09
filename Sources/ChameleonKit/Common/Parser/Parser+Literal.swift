@@ -7,7 +7,7 @@ extension Parser where T: LosslessStringConvertible {
             var valueIterator = valueString.indices.makeIterator()
 
             while let inputIndex = inputIterator.next(), let valueIndex = valueIterator.next() {
-                guard input[inputIndex] == valueString[valueIndex] else {
+                guard input[inputIndex].lowercased() == valueString[valueIndex].lowercased() else {
                     throw ParserError.matchFailed(
                         name: "literal(\(valueString))",
                         reason: "Match Failed at: '\(input[...inputIndex])': Character mismatch '\(input[inputIndex])' != '\(valueString[valueIndex])'"
