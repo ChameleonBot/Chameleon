@@ -26,4 +26,21 @@ final class SlackBotTests: XCTestCase {
 
         XCTAssertEqual(count, 4)
     }
+
+    func testBlockElementMatching_ExactMatch_CaseInsensitive() throws {
+        let test = try SlackBot.test()
+        var count = 0
+
+        test.bot.listen(for: .message) { bot, message in
+            try message.matching("hello world") { count += 1 }
+            try message.matching("HELLO WORLD") { count += 1 }
+
+            try message.richText().matching(["hello world"]) { count += 1 }
+            try message.richText().matching(["HELLO WORLD"]) { count += 1 }
+        }
+        try test.send(.event(.message([.text("hello world")])))
+        try test.send(.event(.message([.text("HELLO WORLD")])))
+
+        XCTAssertEqual(count, 8)
+    }
 }
