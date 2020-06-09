@@ -9,7 +9,7 @@ extension FixtureSource {
 
 extension FixtureSource {
     public static func message(
-        userId: String = "U0000000000",
+        userId: String = "U0000000001",
         channelId: String = "C0000000000",
         kind: Channel.Kind = .channel,
         _ elements: [RichTextFixture]
@@ -51,7 +51,7 @@ extension FixtureSource {
 
 extension FixtureSource {
     public static func message(
-        userId: String = "U0000000000",
+        userId: String = "U0000000001",
         channelId: String = "C0000000000",
         kind: Channel.Kind = .channel,
         _ value: String
