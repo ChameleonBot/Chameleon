@@ -24,7 +24,7 @@ class MockSlackReceiver: SlackReceiver {
     func start() throws { }
 
     // MARK: - Mocking
-    func receive<T>(_ fixture: FixtureSource<SlackReceiver, T>) throws {
+    func receive(_ fixture: FixtureSource<SlackReceiver>) throws {
         try handler.handle(data: fixture.data())
     }
 }

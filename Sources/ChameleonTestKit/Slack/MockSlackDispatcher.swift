@@ -13,7 +13,7 @@ class MockSlackDispatcher: SlackDispatcher {
         self.line = line
     }
 
-    func enqueue<T>(_ fixture: FixtureSource<SlackDispatcher, T>) throws {
+    func enqueue(_ fixture: FixtureSource<SlackDispatcher>) throws {
         try queue.append(fixture.data())
     }
 

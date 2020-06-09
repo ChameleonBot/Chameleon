@@ -25,14 +25,14 @@ extension SlackBot {
             self.errors = errors
         }
 
-        public func send<T>(_ fixture: FixtureSource<SlackReceiver, T>) throws {
+        public func send(_ fixture: FixtureSource<SlackReceiver>) throws {
             try receiver.receive(fixture)
         }
-        public func send<T, U>(_ incoming: FixtureSource<SlackReceiver, T>, enqueue outgoing: FixtureSource<SlackDispatcher, U>) throws {
+        public func send(_ incoming: FixtureSource<SlackReceiver>, enqueue outgoing: FixtureSource<SlackDispatcher>) throws {
             try enqueue(outgoing)
             try send(incoming)
         }
-        public func enqueue<T>(_ fixture: FixtureSource<SlackDispatcher, T>) throws {
+        public func enqueue(_ fixture: FixtureSource<SlackDispatcher>) throws {
             try dispatcher.enqueue(fixture)
         }
     }

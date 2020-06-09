@@ -2,7 +2,7 @@ import ChameleonKit
 import Foundation
 
 extension FixtureSource {
-    public static func user(_ id: String) throws -> FixtureSource<SlackReceiver, Message.Layout.RichText.Element.User> {
+    public static func user(_ id: String) throws -> FixtureSource<RichTextElement> {
         return .init(raw: """
         {
             "type": "user",

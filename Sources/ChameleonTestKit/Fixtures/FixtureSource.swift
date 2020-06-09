@@ -2,7 +2,7 @@ import ChameleonKit
 import Foundation
 import class Foundation.Bundle
 
-public struct FixtureSource<Context, T> {
+public struct FixtureSource<Context> {
     public let data: () throws -> Data
 
     public init(data: @escaping () throws -> Data) {
@@ -11,7 +11,7 @@ public struct FixtureSource<Context, T> {
 }
 
 extension Decodable {
-    public init<C>(from source: FixtureSource<C, Self>) throws {
+    public init<C>(from source: FixtureSource<C>) throws {
         let data = try source.data()
         self = try JSONDecoder().decode(Self.self, from: data)
     }

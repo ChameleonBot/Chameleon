@@ -13,7 +13,7 @@ extension FixtureSource {
         channelId: String = "C0000000000",
         kind: Channel.Kind = .channel,
         _ elements: [RichTextFixture]
-    ) throws -> FixtureSource<SlackReceiver, Message> {
+    ) throws -> FixtureSource<SlackReceiver> {
 
         let pairs = try elements
             .map { try $0.values() }
@@ -55,36 +55,7 @@ extension FixtureSource {
         channelId: String = "C0000000000",
         kind: Channel.Kind = .channel,
         _ value: String
-    ) -> FixtureSource<SlackReceiver, Message> {
-
-        return .init(raw: """
-        {
-          "ts" : "1591498892.001400",
-          "event_ts" : "1591498892.001400",
-          "type" : "message",
-          "channel_type" : "\(kind.rawValue)",
-          "text" : "\(value)",
-          "user" : "\(userId)",
-          "channel" : "\(channelId)",
-          "team" : "T00000000",
-          "blocks" : [
-            {
-              "elements" : [
-                {
-                  "elements" : [
-                    {
-                      "type" : "text",
-                      "text" : "\(value)"
-                    }
-                  ],
-                  "type" : "rich_text_section"
-                }
-              ],
-              "type" : "rich_text",
-              "block_id" : "ORm"
-            }
-          ]
-        }
-        """)
+    ) throws -> FixtureSource<SlackReceiver> {
+        return try message(userId: userId, channelId: channelId, kind: kind, [.text(value)])
     }
 }
