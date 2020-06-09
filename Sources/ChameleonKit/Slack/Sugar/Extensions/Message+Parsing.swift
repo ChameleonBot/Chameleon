@@ -1,4 +1,7 @@
 extension Message {
+    public func matching<T>(debug: DebugLevel = .none, _ parser: Parser<T>, match: () throws -> Void) throws {
+        return try matching(debug: debug, parser) { _ in try match() }
+    }
     public func matching<T>(debug: DebugLevel = .none, _ parser: Parser<T>, match: (T) throws -> Void) throws {
         var errors: [Error] = []
 
