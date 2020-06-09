@@ -39,6 +39,10 @@ extension FixtureSource {
 public struct EncodeMany<Set: CodableElementSet>: Encodable {
     @ManyOf<Set> public var values: [Set.Element]
 
+    public init(values: [Set.Element]) {
+        self.values = values
+    }
+
     public func encode(to encoder: Encoder) throws {
         try _values.encode(to: encoder)
     }
