@@ -27,4 +27,3 @@ final class SlackBotTests: XCTestCase {
         XCTAssertEqual(count, 4)
     }
 }
-
