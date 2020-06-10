@@ -1,6 +1,6 @@
 extension ElementMatcher: ExpressibleByStringLiteral {
     public init(stringLiteral value: StringLiteralType) {
-        self = .equals(value)
+        self = .contains(value)
     }
 }
 //extension ElementMatcher: ExpressibleByStringInterpolation {

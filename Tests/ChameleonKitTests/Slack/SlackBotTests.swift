@@ -11,6 +11,7 @@ final class SlackBotTests: XCTestCase {
         try test.send(.event(.message("hello world")))
 
         XCTAssertEqual(message?.text, "hello world")
+        XCTAssertClear(test)
     }
 
     func testMatching_ExactMatch_CaseInsensitive() throws {
@@ -28,5 +29,24 @@ final class SlackBotTests: XCTestCase {
         try test.send(.event(.message("HELLO WORLD")))
 
         XCTAssertEqual(count, 8)
+        XCTAssertClear(test)
+    }
+
+    func testMatching_InlineMatch_CaseInsensitive() throws {
+        let test = try SlackBot.test()
+        var count = 0
+
+        test.bot.listen(for: .message) { bot, message in
+            try message.matching("hello world") { count += 1 }
+            try message.matching("HELLO WORLD") { count += 1 }
+
+            try message.richText().matching(["hello world"]) { count += 1 }
+            try message.richText().matching(["HELLO WORLD"]) { count += 1 }
+        }
+        try test.send(.event(.message("well hello world, how are you?")))
+        try test.send(.event(.message("well HELLO WORLD, how are you?!")))
+
+        XCTAssertEqual(count, 8)
+        XCTAssertClear(test)
     }
 }
