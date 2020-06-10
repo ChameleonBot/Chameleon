@@ -20,6 +20,8 @@ public struct Message: Codable, Equatable {
     @Default<Empty> public var pinned_to: [Identifier<Channel>]
 
     @ManyOf<LayoutBlocks> public var blocks: [LayoutBlock]
+
+    @Default<Empty> public var attachments: [Attachment]
 }
 
 extension Message {
