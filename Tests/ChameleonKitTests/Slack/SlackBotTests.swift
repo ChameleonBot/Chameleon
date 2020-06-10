@@ -49,4 +49,21 @@ final class SlackBotTests: XCTestCase {
         XCTAssertEqual(count, 8)
         XCTAssertClear(test)
     }
+
+    func testMatching_MultipleElements() throws {
+        let test = try SlackBot.test()
+        var count = 0
+
+        test.bot.listen(for: .message) { bot, message in
+            try message.matching("hello " && .user(bot.me)) { count += 1 }
+            try message.matching("HELLO " && .user(bot.me)) { count += 1 }
+
+            try message.richText().matching(["hello", .user(bot.me)]) { count += 1 }
+            try message.richText().matching(["HELLO", .user(bot.me)]) { count += 1 }
+        }
+        try test.send(.event(.message([.text("hello "), .user(test.bot.me.id.rawValue)])))
+
+        XCTAssertEqual(count, 4)
+        XCTAssertClear(test)
+    }
 }
