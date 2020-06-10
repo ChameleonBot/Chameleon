@@ -14,4 +14,12 @@ extension Message {
             .compactMap { $0 as? Layout.RichText.Element.Channel }
             .map { $0.channel_id }
     }
+
+    public var isUnfurl: Bool {
+        guard subtype == .message_changed, let previous = previous else { return false }
+        guard previous.text == text else { return false }
+        guard previous.attachments.isEmpty, attachments.contains(where: { $0.original_url != nil }) else { return false }
+
+        return true
+    }
 }
