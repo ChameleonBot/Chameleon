@@ -1,7 +1,7 @@
 {
-	"id": "U0000000001",
+	"id": "%userId%",
 	"team_id": "T00000000",
-	"name": "testuser",
+	"name": "%name%",
 	"deleted": false,
 	"color": "db3150",
 	"real_name": "Test",

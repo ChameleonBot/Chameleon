@@ -13,6 +13,9 @@ extension FixtureKey {
     public static var token: FixtureKey { .init(rawValue: #function) }
 
     public static var user: FixtureKey { .init(rawValue: #function) }
+    public static var userId: FixtureKey { .init(rawValue: #function) }
+    
+    public static var name: FixtureKey { .init(rawValue: #function) }
 
     public static var email: FixtureKey { .init(rawValue: #function) }
 }
