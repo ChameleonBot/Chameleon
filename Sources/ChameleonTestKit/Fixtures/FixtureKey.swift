@@ -11,4 +11,6 @@ public struct FixtureKey: RawRepresentable, Hashable {
 extension FixtureKey {
     public static var event: FixtureKey { .init(rawValue: #function) }
     public static var token: FixtureKey { .init(rawValue: #function) }
+
+    public static var email: FixtureKey { .init(rawValue: #function) }
 }
