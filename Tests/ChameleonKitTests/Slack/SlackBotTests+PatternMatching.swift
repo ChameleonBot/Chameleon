@@ -2,7 +2,7 @@ import XCTest
 import ChameleonKit
 import ChameleonTestKit
 
-final class SlackBotTests: XCTestCase {
+final class SlackBotTests_PatternMatching: XCTestCase {
     func testSlackEvents_Message() throws {
         let test = try SlackBot.test()
 
