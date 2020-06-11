@@ -14,7 +14,7 @@ extension SlackBot {
     public struct Test {
         public let bot: SlackBot
         public let errors: Errors
-        public var sentPackets: [[String: Any]] { dispatcher.packets }
+        public let sentPackets: Packets
 
         let dispatcher: MockSlackDispatcher
         let receiver: MockSlackReceiver
@@ -24,6 +24,9 @@ extension SlackBot {
             self.dispatcher = dispatcher
             self.receiver = receiver
             self.errors = errors
+            self.sentPackets = Packets()
+
+            dispatcher.onPacket = sentPackets.append
         }
 
         public func send(_ fixture: FixtureSource<SlackReceiver>) throws {

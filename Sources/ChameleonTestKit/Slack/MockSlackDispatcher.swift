@@ -11,7 +11,7 @@ class MockSlackDispatcher: SlackDispatcher {
     private let line: UInt
 
     var queueCount: Int { queue.count }
-    var packets: [[String: Any]] = []
+    var onPacket: (Encodable?) -> Void = { _ in }
 
     init(file: StaticString, line: UInt) {
         self.file = file
@@ -23,14 +23,7 @@ class MockSlackDispatcher: SlackDispatcher {
     }
 
     func perform<T>(_ action: SlackAction<T>) throws -> T {
-        if let packet = action.packet {
-            let data = try JSONEncoder().encode(AnyEncodable(packet))
-            guard let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
-                let string = String(data: data, encoding: .utf8) ?? ""
-                throw PacketError.invalidPacket(string)
-            }
-            packets.append(dict)
-        }
+        onPacket(action.packet)
 
         guard let data = queue.first else {
             let message = "Unable to perform '\(action.name)'. There are no items enqueued."
