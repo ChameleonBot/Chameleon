@@ -7,6 +7,6 @@ extension FixtureSource {
     }
 
     public static func user(email: String? = nil) throws -> FixtureSource<User> {
-        return try .init(jsonFile: "User", map: [.email: email ?? "null"])
+        return try .init(jsonFile: "User", map: [.email: email.map({ "\"\($0)\"" }) ?? "null"])
     }
 }

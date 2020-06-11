@@ -9,7 +9,7 @@
 	"tz_label": "Pacific Daylight Time",
 	"tz_offset": -25200,
 	"profile": {
-		"email": "%email%",
+		"email": %email%,
 		"title": "",
 		"phone": "",
 		"skype": "",
