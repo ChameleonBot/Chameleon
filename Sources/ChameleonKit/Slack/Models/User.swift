@@ -21,7 +21,7 @@ public struct User: Codable, Equatable {
     public var is_bot: Bool
     public var is_app_user: Bool
 
-    public var locale: String
+    public var locale: String?
 
     public var profile: Profile
 }
