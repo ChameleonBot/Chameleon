@@ -5,7 +5,8 @@ public protocol SlackReceiver: AnyObject {
     @discardableResult
     func listen<T>(for event: SlackEvent<T>, _ closure: @escaping (T) throws -> Void) -> Cancellable
 
-    func listen(for slashCommand: SlackSlashCommand, _ closure: @escaping (SlashCommand) throws -> Void)
+    @discardableResult
+    func listen(for slashCommand: SlackSlashCommand, _ closure: @escaping (SlashCommand) throws -> Void) -> Cancellable
 
     func start() throws
 }

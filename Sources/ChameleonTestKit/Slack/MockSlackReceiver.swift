@@ -6,25 +6,28 @@ extension SlackBot {
 }
 
 class MockSlackReceiver: SlackReceiver {
-    private let handler: SlackEventHandler
+    private let eventHandler: SlackEventHandler
+    private let slashCommandHandler: SlashCommandHandler
 
     public var onError: (Error) -> Void = { _ in }
 
     init(verificationToken: String = SlackBot.validTestToken) {
-        self.handler = SlackEventHandler(verificationToken: verificationToken)
+        self.eventHandler = SlackEventHandler(verificationToken: verificationToken)
+        self.slashCommandHandler = SlashCommandHandler(verificationToken: verificationToken)
     }
 
     @discardableResult
     func listen<T>(for event: SlackEvent<T>, _ closure: @escaping (T) throws -> Void) -> Cancellable {
-        return handler.listen(for: event, closure)
+        return eventHandler.listen(for: event, closure)
     }
-    func listen(for slashCommand: SlackSlashCommand, _ closure: @escaping (SlashCommand) throws -> Void) {
-        fatalError("Not implemented yet")
+    @discardableResult
+    func listen(for slashCommand: SlackSlashCommand, _ closure: @escaping (SlashCommand) throws -> Void) -> Cancellable {
+        return slashCommandHandler.listen(for: slashCommand, closure)
     }
     func start() throws { }
 
     // MARK: - Mocking
     func receive(_ fixture: FixtureSource<SlackReceiver>) throws {
-        try handler.handle(data: fixture.data())
+        try eventHandler.handle(data: fixture.data())
     }
 }

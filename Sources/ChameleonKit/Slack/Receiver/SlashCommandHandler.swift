@@ -5,7 +5,7 @@ public class SlashCommandHandler {
 
     // MARK: - Private Properties
     private let verificationToken: String
-    private var slashCommandHandlers: [String: [SlashCommandHandler]] = [:]
+    private var slashCommandHandlers: [String: [String: SlashCommandHandler]] = [:]
 
     // MARK: - Lifecycle
     public init(verificationToken: String) {
@@ -13,10 +13,14 @@ public class SlashCommandHandler {
     }
 
     // MARK: - Public Functions
-    public func listen(for slashCommand: SlackSlashCommand, _ closure: @escaping (SlashCommand) throws -> Void) {
-        var handlers = slashCommandHandlers[slashCommand.normalized, default: []]
-        handlers.append(closure)
+    public func listen(for slashCommand: SlackSlashCommand, _ closure: @escaping (SlashCommand) throws -> Void) -> Cancellable {
+        var handlers = slashCommandHandlers[slashCommand.normalized, default: [:]]
+        let id = UUID().uuidString
+        handlers[id] = closure
         slashCommandHandlers[slashCommand.normalized] = handlers
+        return .init { [weak self] in
+            self?.slashCommandHandlers[slashCommand.normalized]?[id] = nil
+        }
     }
     public func handle(data: Data) throws {
         guard
@@ -28,6 +32,6 @@ public class SlashCommandHandler {
 
         let command = try SlashCommand(from: json)
         guard let handlers = slashCommandHandlers[command.command.normalized] else { return }
-        try handlers.forEach { try $0(command) }
+        try handlers.values.forEach { try $0(command) }
     }
 }
