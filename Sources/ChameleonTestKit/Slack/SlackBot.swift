@@ -14,6 +14,7 @@ extension SlackBot {
     public struct Test {
         public let bot: SlackBot
         public let errors: Errors
+        public var sentPackets: [[String: Any]] { dispatcher.packets }
 
         let dispatcher: MockSlackDispatcher
         let receiver: MockSlackReceiver
@@ -28,8 +29,8 @@ extension SlackBot {
         public func send(_ fixture: FixtureSource<SlackReceiver>) throws {
             try receiver.receive(fixture)
         }
-        public func send(_ incoming: FixtureSource<SlackReceiver>, enqueue outgoing: FixtureSource<SlackDispatcher>) throws {
-            try enqueue(outgoing)
+        public func send(_ incoming: FixtureSource<SlackReceiver>, enqueue response: FixtureSource<SlackDispatcher>) throws {
+            try enqueue(response)
             try send(incoming)
         }
         public func enqueue(_ fixture: FixtureSource<SlackDispatcher>) throws {
