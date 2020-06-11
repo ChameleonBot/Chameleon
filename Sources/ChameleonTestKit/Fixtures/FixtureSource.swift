@@ -8,6 +8,10 @@ public struct FixtureSource<Context> {
     public init(data: @escaping () throws -> Data) {
         self.data = data
     }
+
+    public func string() throws -> String {
+        return try String(data: data(), encoding: .utf8)!
+    }
 }
 
 extension Decodable {

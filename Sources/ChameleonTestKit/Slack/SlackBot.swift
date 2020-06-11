@@ -29,12 +29,12 @@ extension SlackBot {
         public func send(_ fixture: FixtureSource<SlackReceiver>) throws {
             try receiver.receive(fixture)
         }
-        public func send(_ incoming: FixtureSource<SlackReceiver>, enqueue response: FixtureSource<SlackDispatcher>) throws {
-            try enqueue(response)
+        public func send(_ incoming: FixtureSource<SlackReceiver>, enqueue responses: [FixtureSource<SlackDispatcher>]) throws {
+            try enqueue(responses)
             try send(incoming)
         }
-        public func enqueue(_ fixture: FixtureSource<SlackDispatcher>) throws {
-            try dispatcher.enqueue(fixture)
+        public func enqueue(_ fixtures: [FixtureSource<SlackDispatcher>]) throws {
+            try fixtures.forEach(dispatcher.enqueue)
         }
     }
 
@@ -44,7 +44,7 @@ extension SlackBot {
         let receiver = MockSlackReceiver()
         
         try dispatcher.enqueue(.authDetails())
-        try dispatcher.enqueue(.bot())
+        try dispatcher.enqueue(.usersInfo(.bot()))
 
         let bot = SlackBot(dispatcher: dispatcher, receiver: receiver)
         bot.listen(for: .error) { errors.append($1) }

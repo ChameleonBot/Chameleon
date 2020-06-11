@@ -12,5 +12,7 @@ extension FixtureKey {
     public static var event: FixtureKey { .init(rawValue: #function) }
     public static var token: FixtureKey { .init(rawValue: #function) }
 
+    public static var user: FixtureKey { .init(rawValue: #function) }
+
     public static var email: FixtureKey { .init(rawValue: #function) }
 }
