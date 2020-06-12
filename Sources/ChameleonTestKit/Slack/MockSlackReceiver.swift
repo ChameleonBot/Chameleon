@@ -14,6 +14,9 @@ class MockSlackReceiver: SlackReceiver {
     init(verificationToken: String = SlackBot.validTestToken) {
         self.eventHandler = SlackEventHandler(verificationToken: verificationToken)
         self.slashCommandHandler = SlashCommandHandler(verificationToken: verificationToken)
+
+        self.eventHandler.onError = { [weak self] in self?.onError($0) }
+        self.slashCommandHandler.onError = { [weak self] in self?.onError($0) }
     }
 
     @discardableResult

@@ -20,7 +20,7 @@ public class Errors: Equatable, CustomStringConvertible {
     }
 
     public var description: String {
-        return errors.map(errorString).joined(separator: "\n")
+        return errors.map({ "\($0)" }).joined(separator: "\n")
     }
 }
 
