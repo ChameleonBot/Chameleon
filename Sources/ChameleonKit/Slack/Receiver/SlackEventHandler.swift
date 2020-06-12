@@ -4,7 +4,7 @@ public class SlackEventHandler {
     struct EventHandler {
         typealias Predicate = (String, [String: Any]) -> Bool
         typealias Processor = ([String: Any]) throws -> Any
-        typealias Handler = (Any) -> Void
+        typealias Handler = ([String: Any], Any) -> Void
 
         let predicate: Predicate
         let processor: Processor
@@ -28,9 +28,13 @@ public class SlackEventHandler {
     public func listen<T>(for event: SlackEvent<T>, _ closure: @escaping (T) throws -> Void) -> Cancellable {
         var eventHandler = eventHandlers[event.identifier] ?? EventHandler(predicate: event.canHandle, processor: event.handle, handlers: [:])
         let id = UUID().uuidString
-        eventHandler.handlers[id] = { [unowned self] in
-            do { try closure($0 as! T) }
-            catch let error { self.onError(error) }
+        eventHandler.handlers[id] = { [unowned self] event, value in
+            do {
+                try closure(value as! T)
+                
+            } catch let error {
+                self.onError(SlackEventError(event: event, error: error))
+            }
         }
         eventHandlers[event.identifier] = eventHandler
         return .init { [weak self] in
@@ -53,8 +57,8 @@ public class SlackEventHandler {
 
             let matchingHandlers = eventHandlers.values.filter { $0.predicate(eventType, event) }
             for eventHandler in matchingHandlers {
-                let processed = try eventHandler.processor(event)
-                eventHandler.handlers.values.forEach { $0(processed) }
+                let value = try eventHandler.processor(event)
+                eventHandler.handlers.values.forEach { $0(event, value) }
             }
 
         } catch let error {

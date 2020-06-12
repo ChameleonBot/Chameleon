@@ -17,11 +17,3 @@ extension DebugLevel {
         return .init { throw $0 }
     }
 }
-
-public struct CompositeError: Error {
-    public let errors: [Error]
-
-    public init(errors: [Error]) {
-        self.errors = errors
-    }
-}

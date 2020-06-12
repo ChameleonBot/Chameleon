@@ -20,8 +20,12 @@ public class SlashCommandHandler {
         var handlers = slashCommandHandlers[slashCommand.normalized, default: [:]]
         let id = UUID().uuidString
         handlers[id] = { [unowned self] command in
-            do { try closure(command) }
-            catch let error { self.onError(error) }
+            do {
+                try closure(command)
+
+            } catch let error {
+                self.onError(SlashCommandError(command: command, error: error))
+            }
         }
         slashCommandHandlers[slashCommand.normalized] = handlers
         return .init { [weak self] in
