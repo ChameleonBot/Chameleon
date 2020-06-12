@@ -7,7 +7,7 @@ protocol ErrorContainer {
 
 extension SlackEventError: ErrorContainer { }
 extension SlashCommandError: ErrorContainer { }
-extension SlashActionError: ErrorContainer { }
+extension SlackActionError: ErrorContainer { }
 
 extension Error {
     func traverse(_ first: ErrorContainer.Type, _ rest: ErrorContainer.Type..., file: StaticString = #file, line: UInt = #line) -> Error? {
