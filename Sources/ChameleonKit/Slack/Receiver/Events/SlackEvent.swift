@@ -1,8 +1,8 @@
 import Foundation
 
-public struct SlackEvent<Packet> {
+public struct SlackEvent<Result> {
     public typealias CanHandle = (_ type: String, _ json: [String: Any]) -> Bool
-    public typealias Handler = (_ json: [String: Any]) throws -> Packet
+    public typealias Handler = (_ json: [String: Any]) throws -> Result
 
     public let identifier: String
     public let canHandle: CanHandle
@@ -15,13 +15,13 @@ public struct SlackEvent<Packet> {
     }
 }
 
-extension SlackEvent where Packet: Decodable {
+extension SlackEvent where Result: Decodable {
     public init(identifier: String, canHandle: @escaping CanHandle) {
         self.init(
             identifier: identifier,
             canHandle: canHandle,
             handler: { json in
-                return try Packet(from: json, decoder: JSONDecoder().debug(json))
+                return try Result(from: json, decoder: JSONDecoder().debug(json))
             }
         )
     }
