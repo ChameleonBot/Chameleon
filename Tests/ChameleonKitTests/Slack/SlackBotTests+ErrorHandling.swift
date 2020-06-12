@@ -3,18 +3,27 @@ import ChameleonKit
 import ChameleonTestKit
 
 final class SlackBotTests_ErrorHandling: XCTestCase {
-    func testSlackBot_SinglePerform() throws {
+    func testSlackBot_EventError() throws {
         let test = try SlackBot.test()
 
-        try test.enqueue([.emptyJson])
-        _ = try? test.bot.perform(.authDetails)
+        test.bot.listen(for: .message) { bot, _ in
+            try test.enqueue([.emptyJson])
+            try test.bot.perform(.authDetails)
+        }
+        try test.send(.event(.message("")))
 
         XCTAssertEqual(test.errors.count, 1)
-        switch test.errors[0] {
+
+        let expected = test.errors[0].traverse(
+            SlackEventError.self, SlackActionError<AuthenticationDetails>.self
+        )
+
+        switch expected {
         case DecodingError.valueNotFound?:
             XCTAssertTrue(true)
+
         default:
-            XCTFail("Unexpected error type")
+            XCTFail("Unexpected error: \(expected as Any)")
         }
     }
 }
