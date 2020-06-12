@@ -4,6 +4,14 @@ public class Errors: Equatable, CustomStringConvertible {
     public var count: Int { errors.count }
     public func append(_ error: Error) { errors.append(error) }
 
+    public var first: Error? { errors.first }
+    public subscript(index: Int) -> Error? {
+        guard errors.indices.contains(index) else { return nil }
+
+        return errors[index]
+    }
+    public var last: Error? { errors.last }
+
     public static func ==(lhs: Errors, rhs: Errors) -> Bool {
         return lhs.errors.map(errorString) == rhs.errors.map(errorString)
     }
