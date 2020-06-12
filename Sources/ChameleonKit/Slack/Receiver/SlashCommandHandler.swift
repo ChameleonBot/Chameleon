@@ -19,9 +19,9 @@ public class SlashCommandHandler {
     public func listen(for slashCommand: SlackSlashCommand, _ closure: @escaping (SlashCommand) throws -> Void) -> Cancellable {
         var handlers = slashCommandHandlers[slashCommand.normalized, default: [:]]
         let id = UUID().uuidString
-        handlers[id] = { [weak self] command in
+        handlers[id] = { [unowned self] command in
             do { try closure(command) }
-            catch let error { self?.onError(error) }
+            catch let error { self.onError(error) }
         }
         slashCommandHandlers[slashCommand.normalized] = handlers
         return .init { [weak self] in

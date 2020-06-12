@@ -28,9 +28,9 @@ public class SlackEventHandler {
     public func listen<T>(for event: SlackEvent<T>, _ closure: @escaping (T) throws -> Void) -> Cancellable {
         var eventHandler = eventHandlers[event.identifier] ?? EventHandler(predicate: event.canHandle, processor: event.handle, handlers: [:])
         let id = UUID().uuidString
-        eventHandler.handlers[id] = { [weak self] in
+        eventHandler.handlers[id] = { [unowned self] in
             do { try closure($0 as! T) }
-            catch let error { self?.onError(error) }
+            catch let error { self.onError(error) }
         }
         eventHandlers[event.identifier] = eventHandler
         return .init { [weak self] in
