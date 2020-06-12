@@ -35,13 +35,7 @@ public class SlackBot {
     // MARK: - Public Functions - Dispatching
     @discardableResult
     public func perform<T>(_ action: SlackAction<T>) throws -> T {
-        do {
-            return try dispatcher.perform(action)
-
-        } catch let error {
-            receivedError(error)
-            throw error
-        }
+        return try dispatcher.perform(action)
     }
     public func lookup<T: Hydratable>(_ identifier: Identifier<T>) throws -> T {
         if let existing = hydrationCache[identifier.cacheKey] as? T {

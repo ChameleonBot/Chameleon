@@ -54,6 +54,8 @@ public class VaporReceiver: SlackReceiver {
 
     // MARK: - Private Functions
     private func enableEvents() {
+        eventHandler.onError = { [weak self] in self?.onError($0) }
+
         router.get("ping") { try HTTPStatus.ok.encode(for: $0) }
 
         router.grouped(Printer()).post("event") { [unowned self] req -> Future<EventResponse> in
@@ -68,8 +70,7 @@ public class VaporReceiver: SlackReceiver {
                     let data = req.http.body.data ?? Data("{}".utf8)
 
                     DispatchQueue.global().async {
-                        do { try self.eventHandler.handle(data: data) }
-                        catch let error { self.onError(error) }
+                        self.eventHandler.handle(data: data)
                     }
 
                     return success
@@ -82,6 +83,8 @@ public class VaporReceiver: SlackReceiver {
         }
     }
     private func enableSlashCommands() {
+        slashCommandHandler.onError = { [weak self] in self?.onError($0) }
+
         router.grouped(Printer()).post(["slashCommand", PathComponent.anything]) { [unowned self] req -> Future<EventResponse> in
             let success = req.future(EventResponse.success)
 
@@ -93,7 +96,7 @@ public class VaporReceiver: SlackReceiver {
                 do {
                     let packet = try req.content.syncDecode(WithToken<SlashCommand>.self)
                     let data = try JSONEncoder().encode(packet)
-                    try self.slashCommandHandler.handle(data: data)
+                    self.slashCommandHandler.handle(data: data)
 
                 } catch let error {
                     self.onError(error)
