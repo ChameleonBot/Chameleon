@@ -1,6 +1,6 @@
 import Foundation
 
-public struct SlackError: Error, Equatable, Decodable {
+public struct SlackAPIError: Error, Equatable, Decodable {
     public var ok: Bool
     public var error: String
     public var packet: [String: String]

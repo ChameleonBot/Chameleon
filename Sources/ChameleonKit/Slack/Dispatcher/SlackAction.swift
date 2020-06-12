@@ -22,7 +22,7 @@ public struct SlackAction<Value> {
         self.encoding = encoding
         self.packet = packet
         self.handle = { packet in
-            if let error = try? SlackError(from: packet) {
+            if let error = try? SlackAPIError(from: packet) {
                 throw error
             }
             return try handler(packet)
