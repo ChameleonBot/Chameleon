@@ -1,10 +1,11 @@
 public struct SlackEventError: Error {
+    public var identifier: String
     public var event: [String: Any]
     public var error: Error
 }
 
 public struct SlashCommandError: Error {
-    public var command: SlashCommand
+    public var command: [String: Any]
     public var error: Error
 }
 

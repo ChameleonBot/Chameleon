@@ -11,8 +11,8 @@ public protocol SlackReceiver: AnyObject {
     func start() throws
 }
 
-public enum SlackPacketError: Error, Equatable {
-    case noToken
-    case invalidToken
-    case invalidPacket
+public enum SlackPacketError: Error {
+    case noToken([String: Any])
+    case invalidToken([String: Any])
+    case invalidPacket(Any)
 }

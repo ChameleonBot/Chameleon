@@ -114,7 +114,7 @@ public class VaporReceiver: SlackReceiver {
         }
 
         return try content.decode(Challenge.self).map { [unowned self] challenge in
-            guard challenge.token == self.verificationToken else { throw SlackPacketError.invalidToken }
+            guard challenge.token == self.verificationToken else { throw SlackPacketError.invalidToken([:]) }
             return .challenge(challenge.challenge)
         }
     }

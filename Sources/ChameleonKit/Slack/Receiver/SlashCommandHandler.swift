@@ -1,7 +1,7 @@
 import Foundation
 
 public class SlashCommandHandler {
-    typealias SlashCommandHandler = (SlashCommand) -> Void
+    typealias SlashCommandHandler = ([String: Any], SlashCommand) -> Void
 
     // MARK: - Private Properties
     private let verificationToken: String
@@ -19,12 +19,12 @@ public class SlashCommandHandler {
     public func listen(for slashCommand: SlackSlashCommand, _ closure: @escaping (SlashCommand) throws -> Void) -> Cancellable {
         var handlers = slashCommandHandlers[slashCommand.normalized, default: [:]]
         let id = UUID().uuidString
-        handlers[id] = { [unowned self] command in
+        handlers[id] = { [unowned self] json, command in
             do {
                 try closure(command)
 
             } catch let error {
-                self.onError(SlashCommandError(command: command, error: error))
+                self.onError(SlashCommandError(command: json, error: error))
             }
         }
         slashCommandHandlers[slashCommand.normalized] = handlers
@@ -34,18 +34,20 @@ public class SlashCommandHandler {
     }
     public func handle(data: Data) {
         do {
-            guard
-                let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                let token = json["token"] as? String
-                else { throw SlackPacketError.noToken }
+            let jsonPacket = try JSONSerialization.jsonObject(with: data, options: [])
 
-            guard token == verificationToken else { throw SlackPacketError.invalidToken }
+            guard let json = jsonPacket as? [String: Any] else { throw SlackPacketError.invalidPacket(jsonPacket) }
+            guard let token = json["token"] as? String else { throw SlackPacketError.noToken(json) }
+            guard token == verificationToken else { throw SlackPacketError.invalidToken(json) }
 
-            let command = try SlashCommand(from: json)
+            do {
+                let command = try SlashCommand(from: json)
+                guard let handlers = slashCommandHandlers[command.command.normalized] else { return }
+                handlers.values.forEach { $0(json, command) }
 
-            guard let handlers = slashCommandHandlers[command.command.normalized] else { return }
-
-            handlers.values.forEach { $0(command) }
+            } catch let error {
+                throw SlashCommandError(command: json, error: error)
+            }
 
         } catch let error {
             onError(error)

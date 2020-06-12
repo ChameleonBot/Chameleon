@@ -28,12 +28,12 @@ public class SlackEventHandler {
     public func listen<T>(for event: SlackEvent<T>, _ closure: @escaping (T) throws -> Void) -> Cancellable {
         var eventHandler = eventHandlers[event.identifier] ?? EventHandler(predicate: event.canHandle, processor: event.handle, handlers: [:])
         let id = UUID().uuidString
-        eventHandler.handlers[id] = { [unowned self] event, value in
+        eventHandler.handlers[id] = { [unowned self] json, value in
             do {
                 try closure(value as! T)
                 
             } catch let error {
-                self.onError(SlackEventError(event: event, error: error))
+                self.onError(SlackEventError(identifier: event.identifier, event: json, error: error))
             }
         }
         eventHandlers[event.identifier] = eventHandler
@@ -43,22 +43,26 @@ public class SlackEventHandler {
     }
     public func handle(data: Data) {
         do {
-            guard
-                let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                let token = json["token"] as? String
-                else { throw SlackPacketError.noToken }
+            let jsonPacket = try JSONSerialization.jsonObject(with: data, options: [])
 
-            guard token == verificationToken else { throw SlackPacketError.invalidToken }
+            guard let json = jsonPacket as? [String: Any] else { throw SlackPacketError.invalidPacket(jsonPacket) }
+            guard let token = json["token"] as? String else { throw SlackPacketError.noToken(json) }
+            guard token == verificationToken else { throw SlackPacketError.invalidToken(json) }
 
             guard
                 let event = json["event"] as? [String: Any],
                 let eventType = event["type"] as? String
-                else { throw SlackPacketError.invalidPacket }
+                else { throw SlackPacketError.invalidPacket(json) }
 
-            let matchingHandlers = eventHandlers.values.filter { $0.predicate(eventType, event) }
-            for eventHandler in matchingHandlers {
-                let value = try eventHandler.processor(event)
-                eventHandler.handlers.values.forEach { $0(event, value) }
+            let matchingHandlers = eventHandlers.filter { $0.value.predicate(eventType, event) }
+            for (identifier, eventHandler) in matchingHandlers {
+                do {
+                    let value = try eventHandler.processor(event)
+                    eventHandler.handlers.values.forEach { $0(event, value) }
+
+                } catch let error {
+                    throw SlackEventError(identifier: identifier, event: event, error: error)
+                }
             }
 
         } catch let error {

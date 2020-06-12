@@ -33,9 +33,9 @@ class MockSlackDispatcher: SlackDispatcher {
 
         queue = queue.dropFirst()
 
-        guard
-            let packet = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-            else { throw SlackPacketError.invalidPacket }
+        let json = try JSONSerialization.jsonObject(with: data, options: [])
+
+        guard let packet = json as? [String: Any] else { throw SlackPacketError.invalidPacket(json) }
 
         return try action.handle(packet)
     }
