@@ -8,6 +8,8 @@ public protocol SlackReceiver: AnyObject {
     @discardableResult
     func listen(for slashCommand: SlackSlashCommand, _ closure: @escaping (SlashCommand) throws -> Void) -> Cancellable
 
+    func registerAction(id: String, closure: @escaping () throws -> Void)
+
     func start() throws
 }
 

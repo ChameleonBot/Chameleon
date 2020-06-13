@@ -36,6 +36,7 @@ public class SlackBot {
     @discardableResult
     public func perform<T>(_ action: SlackAction<T>) throws -> T {
         do {
+            action.setup(receiver)
             return try dispatcher.perform(action)
             
         } catch let error {
@@ -51,6 +52,9 @@ public class SlackBot {
             hydrationCache[identifier.cacheKey] = value
             return value
         }
+    }
+    public func registerAction(id: String, closure: @escaping () throws -> Void) {
+        receiver.registerAction(id: id, closure: closure)
     }
 
     // MARK: - Public Functions - Errors

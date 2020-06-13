@@ -22,6 +22,7 @@ public class VaporReceiver: SlackReceiver {
     private let verificationToken: String
     private let eventHandler: SlackEventHandler
     private let slashCommandHandler: SlashCommandHandler
+    private let interactionHandler: InteractionHandler
 
     // MARK: - Public Properties
     public var onError: (Error) -> Void = { print("\nVaporReceiver Error:", $0) }
@@ -33,9 +34,13 @@ public class VaporReceiver: SlackReceiver {
         self.verificationToken = verificationToken
         self.eventHandler = SlackEventHandler(verificationToken: verificationToken)
         self.slashCommandHandler = SlashCommandHandler(verificationToken: verificationToken)
+        self.interactionHandler = InteractionHandler(verificationToken: verificationToken)
+
+        router.get("ping") { try HTTPStatus.ok.encode(for: $0) }
 
         enableEvents()
         enableSlashCommands()
+        enableInteractions()
     }
 
     // MARK: - Public Functions
@@ -43,9 +48,14 @@ public class VaporReceiver: SlackReceiver {
     public func listen<T>(for event: SlackEvent<T>, _ closure: @escaping (T) throws -> Void) -> Cancellable {
         return eventHandler.listen(for: event, closure)
     }
+
     @discardableResult
     public func listen(for slashCommand: SlackSlashCommand, _ closure: @escaping (SlashCommand) throws -> Void) -> Cancellable {
         return slashCommandHandler.listen(for: slashCommand, closure)
+    }
+
+    public func registerAction(id: String, closure: @escaping () throws -> Void) {
+        interactionHandler.registerAction(id: id, closure: closure)
     }
 
     public func start() throws {
@@ -55,8 +65,6 @@ public class VaporReceiver: SlackReceiver {
     // MARK: - Private Functions
     private func enableEvents() {
         eventHandler.onError = { [weak self] in self?.onError($0) }
-
-        router.get("ping") { try HTTPStatus.ok.encode(for: $0) }
 
         router.grouped(Printer()).post("event") { [unowned self] req -> Future<EventResponse> in
             return req.content.get(at: "type").flatMap { (type: String) -> Future<EventResponse> in
@@ -105,6 +113,20 @@ public class VaporReceiver: SlackReceiver {
 
             return success
         }
+    }
+    private func enableInteractions() {
+        interactionHandler.onError = { [weak self] in self?.onError($0) }
+
+        router.grouped(Printer()).post("interaction") { [unowned self] req -> EventLoopFuture<Response> in
+            let data = try Data(req.content.syncGet(String.self, at: "payload").utf8)
+
+            DispatchQueue.global().async {
+                self.interactionHandler.handle(data: data)
+            }
+
+            return try HTTPStatus.ok.encode(for: req)
+        }
+
     }
     private func handleUrlVerification(_ content: ContentContainer<Request>) throws -> Future<EventResponse> {
         struct Challenge: Decodable, Equatable {

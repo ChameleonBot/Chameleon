@@ -14,6 +14,15 @@ public struct SlackActionError<T>: Error {
     public var error: Error
 }
 
+public struct InteractionError: Error {
+    public var interaction: [String: Any]
+    public var error: Error
+}
+
+public struct UnregisteredActionError: Error {
+    public var action_id: String
+}
+
 public struct CompositeError: Error {
     public var errors: [Error]
 

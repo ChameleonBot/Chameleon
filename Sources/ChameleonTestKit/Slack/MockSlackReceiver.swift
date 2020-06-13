@@ -8,12 +8,14 @@ extension SlackBot {
 class MockSlackReceiver: SlackReceiver {
     private let eventHandler: SlackEventHandler
     private let slashCommandHandler: SlashCommandHandler
+    private let interactionHandler: InteractionHandler
 
     public var onError: (Error) -> Void = { _ in }
 
     init(verificationToken: String = SlackBot.validTestToken) {
         self.eventHandler = SlackEventHandler(verificationToken: verificationToken)
         self.slashCommandHandler = SlashCommandHandler(verificationToken: verificationToken)
+        self.interactionHandler = InteractionHandler(verificationToken: verificationToken)
 
         self.eventHandler.onError = { [weak self] in self?.onError($0) }
         self.slashCommandHandler.onError = { [weak self] in self?.onError($0) }
@@ -26,6 +28,9 @@ class MockSlackReceiver: SlackReceiver {
     @discardableResult
     func listen(for slashCommand: SlackSlashCommand, _ closure: @escaping (SlashCommand) throws -> Void) -> Cancellable {
         return slashCommandHandler.listen(for: slashCommand, closure)
+    }
+    func registerAction(id: String, closure: @escaping () throws -> Void) {
+        interactionHandler.registerAction(id: id, closure: closure)
     }
     func start() throws { }
 

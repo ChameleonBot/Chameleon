@@ -48,7 +48,15 @@ extension SlackAction {
     public static func respond(to message: Message, _ target: ResponseTarget, with blocks: [LayoutBlockBuilder<MessagesSurface>]) -> SlackAction<Message> {
         let target = target.target(message)
         let packet = BlockPacket(channel: target.channel, thread_ts: target.thread_ts, blocks: blocks.map { $0.build() })
-        return .init(name: "chat.postMessage", method: .post, packet: packet)
+
+        return .init(
+            name: "chat.postMessage",
+            method: .post,
+            packet: packet,
+            setup: { receiver in
+                blocks.forEach { $0.setup(receiver) }
+            }
+        )
     }
 }
 
@@ -60,6 +68,14 @@ extension SlackAction {
 
     public static func speak(in channel: Identifier<Channel>, blocks: [LayoutBlockBuilder<MessagesSurface>]) -> SlackAction<Void> {
         let packet = BlockPacket(channel: channel.rawValue, blocks: blocks.map { $0.build() })
-        return .init(name: "chat.postMessage", method: .post, packet: packet)
+
+        return .init(
+            name: "chat.postMessage",
+            method: .post,
+            packet: packet,
+            setup: { receiver in
+                blocks.forEach { $0.setup(receiver) }
+            }
+        )
     }
 }
