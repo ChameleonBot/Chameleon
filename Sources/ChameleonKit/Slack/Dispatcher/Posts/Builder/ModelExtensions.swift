@@ -28,17 +28,6 @@ extension Text.PlainText: ExpressibleByStringLiteral {
     }
 }
 
-extension URL {
-    init(_ string: String) {
-        self.init(string: string)!
-    }
-}
-extension URL: ExpressibleByStringLiteral {
-    public init(stringLiteral value: String) {
-        self.init(value)
-    }
-}
-
 extension String {
     func slackEscaped() -> String {
         return self
