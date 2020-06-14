@@ -55,6 +55,11 @@ extension SlackAction {
             packet: packet,
             setup: { receiver in
                 blocks.forEach { $0.setup(receiver) }
+            },
+            handler: { packet in
+                var packet = packet
+                packet.squash(from: "message")
+                return try Message(from: packet)
             }
         )
     }

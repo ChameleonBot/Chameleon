@@ -34,8 +34,6 @@ public class InteractionHandler {
                     } else {
                         throw UnregisteredActionError(action_id: action.action_id)
                     }
-
-                    registeredActions[action.action_id] = nil
                 }
 
             } catch let error {
