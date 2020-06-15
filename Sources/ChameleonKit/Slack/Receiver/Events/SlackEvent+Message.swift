@@ -9,8 +9,21 @@ extension SlackEvent {
                 guard let subtype = json["subtype"] as? String else { return true }
 
                 switch subtype {
-                case "message_changed", "thread_broadcast", "message_replied":
+                case "message_changed":
+                    // some "message_changed" events also have "message.subtype" = "tombstone"
+                    // these come through when a message is deleted but has replies
+                    // so the 'tombstone' takes the original messages place.
+                    // these should trigger the `.messageDeleted` event, not `.message`
+                    guard
+                        let message = json["message"] as? [String: Any],
+                        let innerSubtype = message["subtype"] as? String
+                        else { return true }
+
+                    return innerSubtype != "tombstone"
+
+                case "thread_broadcast", "message_replied":
                     return true
+
                 default:
                     return false
                 }
