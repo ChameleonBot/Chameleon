@@ -6,8 +6,15 @@ extension SlackAction {
 }
 
 extension SlackAction {
+    public static func delete(_ interaction: Interaction) -> SlackAction<Void> {
+        return delete(channel: interaction.channel, ts: interaction.message_ts ?? "-invalid-")
+    }
     public static func delete(_ message: Message) -> SlackAction<Void> {
-        let packet = Packet(channel: message.channel.rawValue, ts: message.$thread_ts ?? message.$ts ?? "-invalid-")
+        return delete(channel: message.channel, ts: message.$thread_ts ?? message.$ts ?? "-invalid-")
+    }
+
+    private static func delete(channel: Identifier<Channel>, ts: String) -> SlackAction<Void> {
+        let packet = Packet(channel: channel.rawValue, ts: ts)
         return .init(name: "chat.delete", method: .post, packet: packet)
     }
 }
