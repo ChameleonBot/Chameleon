@@ -13,6 +13,10 @@ public struct SlackEvent<Result> {
         self.canHandle = canHandle
         self.handle = handler
     }
+
+    public init(identifier: String, type: String, handler: @escaping Handler) {
+        self.init(identifier: identifier, canHandle: { t, _ in t == type }, handler: handler)
+    }
 }
 
 extension SlackEvent where Result: Decodable {
@@ -21,8 +25,16 @@ extension SlackEvent where Result: Decodable {
             identifier: identifier,
             canHandle: canHandle,
             handler: { json in
-                return try Result(from: json, decoder: JSONDecoder().debug(json))
+                do {
+                    return try Result(from: json, decoder: JSONDecoder().debug(json))
+                } catch {
+                    return try Nested<Result>(from: json, decoder: JSONDecoder().debug(json)).value
+                }
             }
         )
+    }
+
+    public init(identifier: String, type: String) {
+        self.init(identifier: identifier, canHandle: { t, _ in t == type })
     }
 }
