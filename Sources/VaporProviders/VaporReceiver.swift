@@ -54,7 +54,7 @@ public class VaporReceiver: SlackReceiver {
         return slashCommandHandler.listen(for: slashCommand, closure)
     }
 
-    public func registerAction(id: String, closure: @escaping () throws -> Void) {
+    public func registerAction(id: String, closure: @escaping (Interaction) throws -> Void) {
         interactionHandler.registerAction(id: id, closure: closure)
     }
 

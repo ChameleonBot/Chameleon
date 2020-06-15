@@ -53,7 +53,7 @@ public class SlackBot {
             return value
         }
     }
-    public func registerAction(id: String, closure: @escaping () throws -> Void) {
+    public func registerAction(id: String, closure: @escaping (Interaction) throws -> Void) {
         receiver.registerAction(id: id, closure: closure)
     }
 

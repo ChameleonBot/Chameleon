@@ -29,7 +29,7 @@ class MockSlackReceiver: SlackReceiver {
     func listen(for slashCommand: SlackSlashCommand, _ closure: @escaping (SlashCommand) throws -> Void) -> Cancellable {
         return slashCommandHandler.listen(for: slashCommand, closure)
     }
-    func registerAction(id: String, closure: @escaping () throws -> Void) {
+    func registerAction(id: String, closure: @escaping (Interaction) throws -> Void) {
         interactionHandler.registerAction(id: id, closure: closure)
     }
     func start() throws { }

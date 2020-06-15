@@ -3,7 +3,7 @@ import Foundation
 public class InteractionHandler {
     // MARK: - Private Properties
     private let verificationToken: String
-    private var registeredActions: [String: () throws -> Void] = [:]
+    private var registeredActions: [String: (Interaction) throws -> Void] = [:]
 
     // MARK: - Public Properties
     public var onError: (Error) -> Void = { _ in fatalError("Error handler not attached") }
@@ -14,7 +14,7 @@ public class InteractionHandler {
     }
     
     // MARK: - Public Functions
-    public func registerAction(id: String, closure: @escaping () throws -> Void) {
+    public func registerAction(id: String, closure: @escaping (Interaction) throws -> Void) {
         registeredActions[id] = closure
     }
     public func handle(data: Data) {
@@ -29,7 +29,7 @@ public class InteractionHandler {
                 let interaction = try Interaction(from: json)
                 for action in interaction.actions {
                     if let closure = registeredActions[action.action_id] {
-                        try closure()
+                        try closure(interaction)
 
                     } else {
                         throw UnregisteredActionError(action_id: action.action_id)

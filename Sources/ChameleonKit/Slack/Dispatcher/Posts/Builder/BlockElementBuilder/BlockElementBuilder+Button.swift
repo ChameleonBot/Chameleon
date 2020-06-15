@@ -12,7 +12,7 @@ extension BlockElementBuilder where Context: ButtonContext {
         url: URL? = nil,
         style: Style? = nil,
         confirm: Confirmation? = nil,
-        action: @escaping () throws -> Void
+        action: @escaping (Interaction) throws -> Void
     ) -> BlockElementBuilder {
         return .init(
             setup: { receiver in

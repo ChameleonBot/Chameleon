@@ -6,11 +6,14 @@ public struct Interaction: Codable, Equatable {
         case team = "team.id"
         case channel = "channel.id"
         case user = "user.id"
+        case message_ts = "container.message_ts"
     }
     public var type: String
 
     public var trigger_id: String
     public var response_url: URL
+
+    @NestedKey public var message_ts: String?
 
     @NestedKey public var team: Identifier<Team>
     @NestedKey public var channel: Identifier<ChameleonKit.Channel>
