@@ -5,7 +5,15 @@ extension SlackEvent {
         return .init(
             identifier: "message",
             canHandle: { type, json in
-                return type == "message"
+                guard type == "message" else { return false }
+                guard let subtype = json["subtype"] as? String else { return true }
+
+                switch subtype {
+                case "message_changed", "thread_broadcast", "message_replied":
+                    return true
+                default:
+                    return false
+                }
             },
             handler: { json in
                 // json message data can exist inside root keys:
