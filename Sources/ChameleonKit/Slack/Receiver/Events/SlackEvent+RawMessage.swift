@@ -2,7 +2,7 @@ extension SlackEvent {
     public static var rawMessage: SlackEvent<[String: Any]> {
         return .init(
             identifier: "rawMessage",
-            canHandle: { type, json in type == "message" },
+            type: "message",
             handler: { $0 }
         )
     }
