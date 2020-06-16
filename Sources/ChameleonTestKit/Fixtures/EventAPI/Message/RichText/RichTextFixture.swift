@@ -2,6 +2,10 @@ import ChameleonKit
 
 public struct RichTextFixture {
     let values: () throws -> (MarkdownString, RichTextElement)
+
+    public init(values: @escaping () throws -> (MarkdownString, RichTextElement)) {
+        self.values = values
+    }
 }
 
 extension RichTextFixture {
