@@ -52,3 +52,9 @@ extension NestedCodingKey where Self: RawRepresentable, RawValue == String {
 
     public var nestedKeys: [String] { rawValue.components(separatedBy: ".") }
 }
+
+extension KeyedDecodingContainer {
+    public func decode<T>(_ type: NestedKey<T?>.Type, forKey key: KeyedDecodingContainer<K>.Key) throws -> NestedKey<T?> {
+        return NestedKey<T?>(wrappedValue: try decodeIfPresent(T.self, forKey: key))
+    }
+}
