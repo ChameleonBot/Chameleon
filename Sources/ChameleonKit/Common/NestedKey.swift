@@ -55,6 +55,6 @@ extension NestedCodingKey where Self: RawRepresentable, RawValue == String {
 
 extension KeyedDecodingContainer {
     public func decode<T>(_ type: NestedKey<T?>.Type, forKey key: KeyedDecodingContainer<K>.Key) throws -> NestedKey<T?> {
-        return NestedKey<T?>(wrappedValue: try decodeIfPresent(T.self, forKey: key))
+        return NestedKey<T?>(wrappedValue: try? decode(NestedKey<T>.self, forKey: key).wrappedValue)
     }
 }
