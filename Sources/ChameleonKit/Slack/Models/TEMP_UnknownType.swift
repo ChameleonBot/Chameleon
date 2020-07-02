@@ -1,13 +1,13 @@
 import Foundation
 
-public struct UnknownType: Codable, Equatable {
+struct UnknownType: Codable, Equatable {
     private enum CodingKeys: String, CodingKey {
         case type
     }
 
     let type: String
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.type = try container.decode(String.self, forKey: .type)
 
@@ -20,7 +20,7 @@ public struct UnknownType: Codable, Equatable {
 }
 
 extension CodingUserInfoKey {
-    public static var json: CodingUserInfoKey { return CodingUserInfoKey(rawValue: #function)! }
+    static var json: CodingUserInfoKey { return CodingUserInfoKey(rawValue: #function)! }
 }
 
 extension JSONDecoder {
