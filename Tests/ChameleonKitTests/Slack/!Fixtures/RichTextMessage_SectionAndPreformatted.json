@@ -1,0 +1,44 @@
+{
+  "type" : "message",
+  "ts" : "1593301279.000600",
+  "team" : "T00000000",
+  "event_ts" : "1593301279.000600",
+  "text" : "```hello world <http:\/\/www.google.com>```\n",
+  "channel_type" : "im",
+  "blocks" : [
+    {
+      "block_id" : "ghb",
+      "type" : "rich_text",
+      "elements" : [
+        {
+          "type" : "rich_text_preformatted",
+          "elements" : [
+            {
+              "type" : "text",
+              "text" : "hello world "
+            },
+            {
+              "type" : "link",
+              "url" : "http:\/\/www.google.com"
+            }
+          ]
+        },
+        {
+          "type" : "rich_text_section",
+          "elements" : [
+            {
+              "type" : "text",
+              "text" : "foobar "
+            },
+            {
+              "type" : "link",
+              "url" : "http:\/\/www.apple.com"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "user" : "U0000000001",
+  "channel" : "D0000000000"
+}
