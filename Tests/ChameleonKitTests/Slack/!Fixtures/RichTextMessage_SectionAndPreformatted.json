@@ -3,7 +3,7 @@
   "ts" : "1593301279.000600",
   "team" : "T00000000",
   "event_ts" : "1593301279.000600",
-  "text" : "```hello world <http:\/\/www.google.com>```\n",
+  "text" : "```hello world <http:\/\/www.google.com>```\n foobar <http:\/\/www.apple.com>",
   "channel_type" : "im",
   "blocks" : [
     {
