@@ -38,9 +38,10 @@ extension ArraySlice where Element == RichTextElement {
                     values.append(contentsOf: match.values)
                     remaining = match.remaining
 
-                } catch let error {
-                    try debug.handle(error)
-                    return nil
+                } catch {
+                    // we found the first match, but the subsequent elements were not matched
+                    // so we start over looking for the 'first' match starting past the initial first element
+                    return try remaining.matchQueue(debug, trimWhitespace, matchers)
                 }
             }
 

@@ -99,6 +99,14 @@ final class ElementMatchingTests: XCTestCase {
             .init(rawValue: "user2"),
         ])
     }
+
+    func testMultiplePatterns_ContainingMissAndMatch_AfterInitialMiss_StillMatches() throws {
+        let message = try Message(from: .message([.user("user1"), .text(" hello "), .user("user2"), .text(" hi ")]))
+
+        var users: [Identifier<User>]?
+        try message.richText().matchingAll([.user, "hi"]) { users = $0 }
+        XCTAssertEqual(users, [.init(rawValue: "user2")])
+    }
 }
 
 extension ElementMatcher.Error: Equatable {
