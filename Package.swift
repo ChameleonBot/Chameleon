@@ -1,4 +1,4 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.5
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -15,16 +15,18 @@ let package = Package(
         .library(name: "VaporProviders", targets: ["VaporProviders"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", from: "3.0.0"),
-        .package(url: "https://github.com/vapor/http.git", from: "3.0.0"),
-        .package(url: "https://github.com/vapor/url-encoded-form.git", from: "1.0.0"),
-        .package(url: "https://github.com/vapor/redis.git", from: "3.0.0"),
+		.package(name: "vapor", url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
+        .package(url: "https://github.com/vapor/redis.git", from: "4.0.0"),
     ],
     targets: [
         .target(name: "Chameleon", dependencies: ["ChameleonKit", "VaporProviders"]),
         .target(name: "ChameleonKit", dependencies: []),
         .target(name: "ChameleonTestKit", dependencies: ["ChameleonKit"]),
-        .target(name: "VaporProviders", dependencies: ["ChameleonKit", "Vapor", "HTTP", "URLEncodedForm", "Redis"]),
+        .target(name: "VaporProviders", dependencies: [
+			"ChameleonKit",
+			.product(name: "Vapor", package: "vapor"),
+			.product(name: "Redis", package: "redis"),
+		]),
         .testTarget(name: "ChameleonKitTests", dependencies: ["ChameleonTestKit"]),
     ]
 )

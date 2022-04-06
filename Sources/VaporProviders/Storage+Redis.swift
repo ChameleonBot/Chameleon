@@ -5,11 +5,11 @@ public class RedisStorage: Storage {
     private let keyValueStore: RedisKeyValueStorage
 
     // MARK: - Lifecycle
-    public init(hostname: String, port: Int, password: String?, database: Int?) {
-        self.keyValueStore = RedisKeyValueStorage(hostname: hostname, port: port, password: password, database: database)
+    public init(hostname: String, port: Int, password: String?, database: Int?) throws {
+        self.keyValueStore = try RedisKeyValueStorage(hostname: hostname, port: port, password: password, database: database)
     }
-    public init(url: URL) {
-        self.keyValueStore = RedisKeyValueStorage(url: url)
+    public init(url: URL) throws {
+        self.keyValueStore = try RedisKeyValueStorage(url: url)
     }
 
     // MARK: - Public Functions
@@ -20,7 +20,7 @@ public class RedisStorage: Storage {
         return try exec {
             return  try keyValueStore.raw { client in
                 let allKeys = keys.map { namespaced(namespace, $0) }
-                let rows = try client.mget(allKeys).wait()
+				let rows = try client.mget(allKeys.map(RedisKey.init(_:))).wait()
                 return try zip(allKeys, rows).map { key, data in
                     guard let string = data.string else { throw StorageError.missing(key: key) }
                     guard let value = T(string) else { throw StorageError.invalid(key: key, expected: T.self, found: string) }
@@ -38,7 +38,7 @@ public class RedisStorage: Storage {
     public func keys(in namespace: String) throws -> [String] {
         return try exec {
             return  try keyValueStore.raw { client in
-                let redisKeys = try client.command("KEYS", [.bulkString(namespaced(namespace, "*"))]).wait()
+				let redisKeys = try client.send(command: "KEYS", with: [namespaced(namespace, "*").convertedToRESPValue()]).wait()
                 let keys = redisKeys.array ?? []
                 return keys.compactMap { $0.string?.drop(prefix: namespaced(namespace, "")) }
             }

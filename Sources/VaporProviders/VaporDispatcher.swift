@@ -1,7 +1,5 @@
 import ChameleonKit
 import Vapor
-import HTTP
-import URLEncodedForm
 
 public class VaporDispatcher: SlackDispatcher {
     private let application: Application
@@ -10,7 +8,7 @@ public class VaporDispatcher: SlackDispatcher {
 
     public init(application: Application, token: String) throws {
         self.application = application
-        self.client = try application.make(Client.self)
+		self.client = application.client
         self.token = token
     }
 
@@ -28,7 +26,7 @@ public class VaporDispatcher: SlackDispatcher {
             .send(method, headers: headers, to: "https://slack.com/api/\(action.name)") { request in
                 guard let packet = action.packet else { return }
 
-                let mediaType: MediaType
+                let mediaType: HTTPMediaType
                 switch action.encoding {
                 case .url:  mediaType = .urlEncodedForm
                 case .json: mediaType = .json
@@ -37,10 +35,10 @@ public class VaporDispatcher: SlackDispatcher {
 
                 try request.content.encode(AnyEncodable(packet), as: mediaType)
 
-                print(request.debugDescription)
+				print(request)
             }
-            .map { response in
-                let data = response.http.body.data ?? .init()
+            .flatMapThrowing { response in
+                let data = response.body ?? .init()
                 let json = try JSONSerialization.jsonObject(with: data, options: [])
 
                 guard let packet = json as? [String: Any] else { throw SlackPacketError.invalidPacket(json) }
