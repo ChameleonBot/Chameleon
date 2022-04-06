@@ -21,13 +21,21 @@ let package = Package(
     targets: [
         .target(name: "Chameleon", dependencies: ["ChameleonKit", "VaporProviders"]),
         .target(name: "ChameleonKit", dependencies: []),
-        .target(name: "ChameleonTestKit", dependencies: ["ChameleonKit"]),
+        .target(
+			name: "ChameleonTestKit",
+			dependencies: ["ChameleonKit"],
+			resources: [.copy("Resources")]
+		),
         .target(name: "VaporProviders", dependencies: [
 			"ChameleonKit",
 			.product(name: "Vapor", package: "vapor"),
 			.product(name: "Redis", package: "redis"),
 		]),
-        .testTarget(name: "ChameleonKitTests", dependencies: ["ChameleonTestKit"]),
+        .testTarget(
+			name: "ChameleonKitTests",
+			dependencies: ["ChameleonTestKit"],
+			resources: [.copy("Resources")]
+		),
     ]
 )
 
