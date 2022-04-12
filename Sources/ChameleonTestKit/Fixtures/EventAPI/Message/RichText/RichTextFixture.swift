@@ -27,4 +27,8 @@ extension RichTextFixture {
 
         return .init { try (string, Message.Layout.RichText.Element.Link(from: .link(text: text, url: url))) }
     }
+
+	public static func emoji(_ value: Emoji) -> RichTextFixture {
+		.init { try ("\(value)", Message.Layout.RichText.Element.Emoji(from: .emoji(value))) }
+	}
 }
