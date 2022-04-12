@@ -28,3 +28,24 @@ extension Parser {
         }
     }
 }
+
+private enum ManyParser: Error { case complete }
+
+extension Parser {
+	public var many: Parser<[T]> {
+		let notSelf = Parser<Void> { input in
+			if let _ = try? self.parse(input) {
+				// if self succeeds, we want to throw to
+				// continue the `until`
+				throw ManyParser.complete
+
+			} else {
+				// if self failed, we want to succeed to
+				// end the `until`
+				return (value: (), remainder: input)
+			}
+		}
+
+		return until(notSelf || .end).map { $0.0 }
+	}
+}
