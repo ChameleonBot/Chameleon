@@ -26,11 +26,16 @@ extension FixtureSource {
         self.init(data: { Data(raw.utf8) })
     }
     public init(jsonFile fileName: String, map: [FixtureKey: LosslessStringConvertible] = [:], source: String = #file) throws {
+        var locations: [URL] = [Bundle.module.resourceURL!.appendingPathComponent("Resources").appendingPathComponent("\(fileName).json")]
+
         let file = URL(fileURLWithPath: source)
         let directory = file.deletingLastPathComponent()
         let url = directory.appendingPathComponent("\(fileName).json")
+        locations.append(url)
 
         self.data = {
+            let url = locations.first(where: { FileManager.default.fileExists(atPath: $0.path) })!
+
             guard !map.isEmpty else { return try Data(contentsOf: url) }
 
             let string = try String(contentsOf: url)
