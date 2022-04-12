@@ -20,3 +20,14 @@ extension SlackAction {
         return .init(name: "conversations.info", method: .post, encoding: .url, packet: packet)
     }
 }
+
+extension SlackAction {
+	private struct ConversationPacket: Encodable {
+		let channel: Identifier<Channel>
+	}
+
+	public static func conversation(_ identifier: Identifier<Channel>) -> SlackAction<Conversation> {
+		let packet = ConversationPacket(channel: identifier)
+		return .init(name: "conversations.info", method: .post, encoding: .url, packet: packet)
+	}
+}
